@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "Grafika Komputer",
+			"path": "../Grafika Komputer"
+		},
+		{
+			"name": "P04_Raafi Khasha_2172013",
+			"path": "../Grafika Komputer/P04_Raafi Khasha_2172013"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Grafika Komputer"
+	}
+}
