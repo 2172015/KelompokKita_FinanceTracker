@@ -1,132 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Personal Finance Tracker</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard - Finance Tracker</title>
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>Finance Tracker</h2>
+                <a href="index.html" class="active">Dashboard</a>
+                <a href="transactions.html">Transactions</a>
+                <a href="accounts.html">Accounts</a>
+                <a href="categories.html">Categories</a>
+                <a href="budgets.html">Budgets</a>
+                <a href="reports.html">Reports</a>
+                <a href="profile.html">Profile</a>
+            </div>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">Finance Tracker</div>
-      <nav class="nav">
-        <a href="#" class="nav-item active">Dashboard</a>
-        <a href="#" class="nav-item">Transactions</a>
-        <a href="#" class="nav-item">Accounts</a>
-        <a href="#" class="nav-item">Categories</a>
-        <a href="#" class="nav-item">Budgets</a>
-        <a href="#" class="nav-item">Reports</a>
-        <a href="#" class="nav-item">Profile</a>
-      </nav>
-    </aside>
+            <!-- Main -->
+            <div class="main-content">
+                <div class="header">
+                    <h1>Dashboard</h1>
+                    <button class="btn">Add Transaction</button>
+                </div>
 
-    <!-- Main Content -->
-    <main class="main">
-      <div class="header">
-        <h2>Dashboard</h2>
-        <div class="header-actions">
+                <div class="cards">
+                    <div class="card">
+                        <h3>Income</h3>
+                        <p>$4,987</p>
+                    </div>
+                    <div class="card">
+                        <h3>Expenses</h3>
+                        <p>$2,345</p>
+                    </div>
+                    <div class="card placeholder"></div>
+                </div>
 
-          <!-- Tombol Toggle dengan SVG -->
-          <button class="toggle-btn" id="themeToggle">
-
-            <!-- Sun Icon -->
-            <svg class="icon sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-
-            <!-- Moon Icon -->
-            <svg class="icon moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </button>
-          <button class="btn">Add Transaction</button>
+                <h3>Recent Transactions</h3>
+                <table class="table">
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                    </tr>
+                    <tr>
+                        <td>Apr 10</td>
+                        <td>Salary</td>
+                        <td>Income</td>
+                        <td class="income">+$5,000</td>
+                    </tr>
+                    <tr>
+                        <td>Apr 12</td>
+                        <td>Grocery</td>
+                        <td>Food</td>
+                        <td class="expense">-$150</td>
+                    </tr>
+                    <tr>
+                        <td>Apr 15</td>
+                        <td>Restaurant</td>
+                        <td>Food</td>
+                        <td class="expense">-$60</td>
+                    </tr>
+                    <tr>
+                        <td>Apr 17</td>
+                        <td>Utility Bill</td>
+                        <td>Utilities</td>
+                        <td class="expense">-$100</td>
+                    </tr>
+                </table>
+            </div>
         </div>
-      </div>
-
-      <!-- Summary Cards -->
-      <div class="cards">
-        <div class="card">
-          <h3>Income</h3>
-          <p>$4,987</p>
-        </div>
-        <div class="card">
-          <h3>Expenses</h3>
-          <p>$2,345</p>
-        </div>
-        <div class="card placeholder"></div>
-      </div>
-
-      <!-- Content -->
-      <div class="content">
-        <div class="table-container">
-          <h3>Recent Transactions</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th style="text-align: right;">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Apr 10</td>
-                <td>Salary</td>
-                <td>Income</td>
-                <td class="income" style="text-align: right;">+$5,000.0</td>
-              </tr>
-              <tr>
-                <td>Apr 12</td>
-                <td>Grocery</td>
-                <td>Food</td>
-                <td class="expense" style="text-align: right;">-$150.00</td>
-              </tr>
-              <tr>
-                <td>Apr 15</td>
-                <td>Restaurant</td>
-                <td>Food</td>
-                <td class="expense" style="text-align: right;">-$60.00</td>
-              </tr>
-              <tr>
-                <td>Apr 17</td>
-                <td>Utility Bill</td>
-                <td>Utilities</td>
-                <td class="expense" style="text-align: right;">-$100.00</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="sidebar-right">
-          <div class="mini-card">
-            <h4>Accounts</h4>
-            <p>Coming soon...</p>
-          </div>
-          <div class="mini-card">
-            <h4>Categories</h4>
-            <p>Coming soon...</p>
-          </div>
-          <div class="mini-card">
-            <h4>Reports</h4>
-            <p>Coming soon...</p>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <script src="script.js"></script>
-</body>
+    </body>
 </html>
