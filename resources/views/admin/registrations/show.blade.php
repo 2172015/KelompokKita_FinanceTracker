@@ -1,13 +1,12 @@
-@extends('layouts.app')
-
-@section('title', 'Registration Detail')
-
+@extends('layouts.admin')
+@section('title','Registration Detail')
 @section('content')
-<h1>Registration #{{ $registration->id }}</h1>
-<ul class="list-group">
-    <li class="list-group-item"><strong>User:</strong> {{ $registration->user->name ?? 'N/A' }}</li>
-    <li class="list-group-item"><strong>Event:</strong> {{ $registration->event->name ?? 'N/A' }}</li>
-    <li class="list-group-item"><strong>Status:</strong> {{ $registration->status }}</li>
-</ul>
-<a href="{{ route('registrations.index') }}" class="btn btn-secondary mt-3">Back</a>
+<div class="card card-dark p-3">
+  <h4>Registration #{{ $registration->id }}</h4>
+  <p><strong>User:</strong> {{ $registration->user->name ?? '-' }}</p>
+  <p><strong>Session:</strong> {{ $registration->eventSession->title ?? '-' }}</p>
+  <p><strong>Payment:</strong> {{ $registration->payment_status }}</p>
+  <p><strong>Proof:</strong> {{ $registration->payment_proof ?? '-' }}</p>
+  <a class="btn btn-secondary" href="{{ route('registrations.index') }}">Back</a>
+</div>
 @endsection

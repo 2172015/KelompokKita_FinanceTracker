@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Attendance extends Model
 {
@@ -11,17 +11,22 @@ class Attendance extends Model
 
     protected $fillable = [
         'registration_id',
-        'event_session_id',
-        'attendance_time',
-        'status',
+        'session_id',
+        'scan_time',
     ];
 
+    /**
+     * Relasi: Attendance milik satu registrasi.
+     */
     public function registration()
     {
         return $this->belongsTo(Registration::class);
     }
 
-    public function eventSession()
+    /**
+     * Relasi: Attendance milik satu sesi.
+     */
+    public function session()
     {
         return $this->belongsTo(EventSession::class);
     }

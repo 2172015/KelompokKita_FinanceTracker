@@ -1,48 +1,33 @@
-@extends('layouts.app')
-
-@section('title', 'Sessions')
-
+@extends('layouts.admin')
+@section('title','Event Sessions')
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Sessions</h1>
-    <a href="{{ route('sessions.create') }}" class="btn btn-primary">Add Session</a>
+<div class="mb-3 d-flex justify-content-between">
+  <h3>Sessions</h3>
+  <a href="{{ route('event-sessions.create') }}" class="btn btn-sm btn-primary">+ New Session</a>
 </div>
 
-@if (session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
+@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Event ID</th>
-            <th>Title</th>
-            <th>Speaker</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($sessions as $session)
-        <tr>
-            <td>{{ $session->id }}</td>
-            <td>{{ $session->event_id }}</td>
-            <td>{{ $session->title }}</td>
-            <td>{{ $session->speaker }}</td>
-            <td>{{ $session->date }}</td>
-            <td>{{ $session->time }}</td>
-            <td>
-                <a href="{{ route('sessions.show', $session->id) }}" class="btn btn-sm btn-info">Show</a>
-                <a href="{{ route('sessions.edit', $session->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                <form action="{{ route('sessions.destroy', $session->id) }}" method="POST" class="d-inline">
-                    @csrf @method('DELETE')
-                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this session?')">Delete</button>
-                </form>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
+<table class="table table-dark table-striped">
+<thead><tr><th>#</th><th>Event</th><th>Title</th><th>Speaker</th><th>Start</th><th>End</th><th>Price</th><th>Actions</th></tr></thead>
+<tbody>
+  @foreach($sessions as $s)
+  <tr>
+    <td>{{ $loop->iteration }}</td>
+    <td>{{ $s->event->title ?? '-' }}</td>
+    <td>{{ $s->title }}</td>
+    <td>{{ $s->speaker ?? '-' }}</td>
+    <td>{{ $s->start_time }}</td>
+    <td>{{ $s->end_time }}</td>
+    <td>{{ $s->price }}</td>
+    <td>
+      <a class="btn btn-sm btn-warning" href="{{ route('event-sessions.edit',$s) }}">Edit</a>
+      <form method="POST" action="{{ route('event-sessions.destroy',$s) }}" class="d-inline">@csrf @method('DELETE')<button class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</button></form>
+    </td>
+  </tr>
+  @endforeach
+</tbody>
 </table>
+
+{{ $sessions->links() }}
 @endsection

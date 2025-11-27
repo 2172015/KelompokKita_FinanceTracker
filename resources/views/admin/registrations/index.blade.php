@@ -1,49 +1,30 @@
-@extends('layouts.app')
-
+@extends('layouts.admin')
+@section('title','Registrations')
 @section('content')
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Daftar Registrasi</h2>
-        <a href="{{ route('registrations.create') }}" class="btn btn-primary">Tambah</a>
-    </div>
-
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>#</th>
-                <th>Peserta</th>
-                <th>Sesi</th>
-                <th>Status Pembayaran</th>
-                <th>Bukti</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($registrations as $reg)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $reg->user->name }}</td>
-                <td>{{ $reg->eventSession->title }}</td>
-                <td>{{ ucfirst($reg->payment_status) }}</td>
-                <td>{{ $reg->payment_proof ?? '-' }}</td>
-                <td>
-                    <a href="{{ route('registrations.edit', $reg->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                    <form action="{{ route('registrations.destroy', $reg->id) }}" method="POST" class="d-inline">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('Hapus data ini?')">Hapus</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="6" class="text-center">Belum ada data.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    {{ $registrations->links() }}
+<div class="mb-3 d-flex justify-content-between">
+  <h3>Registrations</h3>
+  <a href="{{ route('registrations.create') }}" class="btn btn-sm btn-primary">+ New</a>
 </div>
+@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+
+<table class="table table-dark table-striped">
+<thead><tr><th>#</th><th>User</th><th>Session</th><th>Payment</th><th>Proof</th><th>Actions</th></tr></thead>
+<tbody>
+  @foreach($registrations as $r)
+  <tr>
+    <td>{{ $loop->iteration }}</td>
+    <td>{{ $r->user->name ?? '—' }}</td>
+    <td>{{ $r->eventSession->title ?? '—' }}</td>
+    <td>{{ $r->payment_status }}</td>
+    <td>{{ $r->payment_proof ?? '-' }}</td>
+    <td>
+      <a class="btn btn-sm btn-info" href="{{ route('registrations.show',$r) }}">Show</a>
+      <a class="btn btn-sm btn-warning" href="{{ route('registrations.edit',$r) }}">Edit</a>
+      <form method="POST" action="{{ route('registrations.destroy',$r) }}" class="d-inline">@csrf @method('DELETE')<button class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</button></form>
+    </td>
+  </tr>
+  @endforeach
+</tbody>
+</table>
+{{ $registrations->links() }}
 @endsection
