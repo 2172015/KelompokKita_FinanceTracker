@@ -2,35 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class EventSession extends Model
 {
     use HasFactory;
 
-    protected $table = 'event_sessions';
-
     protected $fillable = [
         'event_id',
-        'title',
-        'description',
-        'speaker',
+        'name',
         'start_time',
         'end_time',
-        'price',
     ];
 
+    /**
+     * Relasi: Session milik satu Event.
+     */
     public function event()
     {
         return $this->belongsTo(Event::class);
     }
 
-    public function registrations()
-    {
-        return $this->hasMany(Registration::class, 'session_id');
-    }
-
+    /**
+     * Relasi: Session memiliki banyak attendance scan.
+     */
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'session_id');

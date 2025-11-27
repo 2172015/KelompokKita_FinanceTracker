@@ -1,10 +1,32 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Dashboard')
+@section('title', 'Dashboard')
 
 @section('content')
-  <div class="p-4 bg-light rounded">
-    <h1>Welcome, Admin!</h1>
-    <p>This is your dashboard overview.</p>
-  </div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-dark p-4">
+            <h5>Total Events</h5>
+            <h3>{{ $totalEvents }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-dark p-4">
+            <h5>Total Sessions</h5>
+            <h3>{{ $totalSessions }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-dark p-4">
+            <h5>Total Registrations</h5>
+            <h3>{{ $totalRegistrations }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-dark p-4">
+            <h5>Total Attendance</h5>
+            <h3>{{ $totalAttendance }}</h3>
+        </div>
+    </div>
+</div>
 @endsection
