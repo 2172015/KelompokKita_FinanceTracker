@@ -19,48 +19,49 @@
         <h2>FINANCE</h2>
     
         <a href="{{ route('dashboard') }}" 
-           class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+           class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
             <i class="fa-solid fa-gauge"></i> Dashboard
         </a>
     
-        <a href="{{ route('transactions') }}" 
-           class="{{ request()->routeIs('transactions') ? 'active' : '' }}">
+        <a href="{{ route('transactions.index') }}" 
+           class="{{ request()->routeIs('transactions') ? 'active' : '' }} normal">
             <i class="fa-solid fa-wallet"></i> Transactions
         </a>
     
         <a href="{{ route('accounts') }}" 
-           class="{{ request()->routeIs('accounts') ? 'active' : '' }}">
+           class="{{ request()->routeIs('accounts') ? 'active' : '' }} normal">
             <i class="fa-solid fa-building-columns"></i> Accounts
         </a>
     
         <a href="{{ route('budgets') }}" 
-           class="{{ request()->routeIs('budgets') ? 'active' : '' }}">
+           class="{{ request()->routeIs('budgets') ? 'active' : '' }} normal">
             <i class="fa-solid fa-piggy-bank"></i> Budgets
         </a>
     
         <a href="{{ route('categories') }}" 
-           class="{{ request()->routeIs('categories') ? 'active' : '' }}">
+           class="{{ request()->routeIs('categories') ? 'active' : '' }} normal">
             <i class="fa-solid fa-tags"></i> Categories
         </a>
     
         <a href="{{ route('reports') }}" 
-           class="{{ request()->routeIs('reports') ? 'active' : '' }}">
+           class="{{ request()->routeIs('reports') ? 'active' : '' }} normal">
             <i class="fa-solid fa-chart-pie"></i> Reports
         </a>
     
         <a href="{{ route('profile.page') }}" 
-           class="{{ request()->routeIs('profile.page') ? 'active' : '' }}">
+           class="{{ request()->routeIs('profile.page') ? 'active' : '' }} normal">
             <i class="fa-solid fa-user"></i> Profile
         </a>
     
-        <form method="POST" action="{{ route('logout') }}" style="margin-top: 20px;">
+        <a href="none" class="btn btn-danger logout">
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" 
-                    style="background:none;border:none;color:white;cursor:pointer;padding:12px 16px;text-align:left;width:100%;">
+            <button type="submit" style="background:none; border:none; color:white">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </button>
         </form>
-    </div>
+        </a>
+      </div>
     
 
     <!-- Main -->

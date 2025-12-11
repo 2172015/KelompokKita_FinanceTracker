@@ -21,7 +21,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // admin, member, panitia, keuangan
     ];
 
     /**
@@ -47,8 +46,15 @@ class User extends Authenticatable
         ];
     }
 
-    public function registrations()
+    // Relasi: User memiliki banyak Akun (One to Many)
+    public function accounts()
     {
-        return $this->hasMany(Registration::class);
+        return $this->hasMany(Account::class);
+    }
+
+    // Relasi: User memiliki banyak Kategori (One to Many)
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
     }
 }
