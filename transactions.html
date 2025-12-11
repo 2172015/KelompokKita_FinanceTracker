@@ -1,57 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Transactions - Finance Tracker</title>
-        <link rel="stylesheet" href="css/style.css" />
-    </head>
-    <body>
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h2>Finance Tracker</h2>
-            <a href="index.html">Dashboard</a>
-            <a href="transactions.html" class="active">Transactions</a>
-            <a href="accounts.html">Accounts</a>
-            <a href="categories.html">Categories</a>
-            <a href="budgets.html">Budgets</a>
-            <a href="reports.html">Reports</a>
-            <a href="profile.html">Profile</a>
+<head>
+    <meta charset="UTF-8">
+    <title>Transactions - FinansialKu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+      <h2>FINANCE</h2>
+      <a href="index.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a class="active" href="transactions.html"><i class="fa-solid fa-wallet"></i> Transactions</a>
+      <a href="accounts.html"><i class="fa-solid fa-building-columns"></i> Accounts</a>
+      <a href="budgets.html"><i class="fa-solid fa-piggy-bank"></i> Budgets</a>
+      <a href="categories.html"><i class="fa-solid fa-tags"></i> Categories</a>
+      <a href="reports.html"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+      <a href="profile.html"><i class="fa-solid fa-user"></i> Profile</a>
+    </div>
+
+    <div class="main-content">
+
+        <div class="header">
+            <h1>Transaksi</h1>
+            <button class="btn">Tambah Transaksi</button>
         </div>
 
-        <!-- Main -->
-        <div class="main-content">
-            <div class="header">
-                <h1>Transactions</h1>
-                <button class="btn">Add Transaction</button>
-            </div>
-
-            <table class="table">
+        <div class="table-wrapper">
+            <h3>Riwayat Transaksi</h3>
+            <table>
                 <tr>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Account</th>
-                    <th>Amount</th>
-                    <th>Actions</th>
+                    <th>Tanggal</th>
+                    <th>Deskripsi</th>
+                    <th>Categories</th>
+                    <th>Akun</th>
+                    <th>Nominal</th>
+                    <th>Aksi</th>
                 </tr>
                 <tr>
-                    <td>Oct 10</td>
-                    <td>Salary</td>
-                    <td>Income</td>
+                    <td>10 Okt</td>
+                    <td>Gaji</td>
+                    <td>Pemasukan</td>
                     <td>Bank</td>
-                    <td>+ $5,000</td>
-                    <td>Edit | Delete</td>
+                    <td class="income">+ Rp 5.000.000</td>
+                    <td>Edit | Hapus</td>
                 </tr>
                 <tr>
-                    <td>Oct 12</td>
-                    <td>Groceries</td>
-                    <td>Food</td>
-                    <td>Cash</td>
-                    <td>- $150</td>
-                    <td>Edit | Delete</td>
+                    <td>12 Okt</td>
+                    <td>Belanja</td>
+                    <td>Makanan</td>
+                    <td>Tunai</td>
+                    <td class="expense">- Rp 150.000</td>
+                    <td>Edit | Hapus</td>
                 </tr>
             </table>
         </div>
-    </body>
+
+    </div>
+</div>
+
+</body>
 </html>
