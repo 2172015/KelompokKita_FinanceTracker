@@ -47,7 +47,7 @@ body {
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 5px;
 }
 
 .sidebar h2 {
@@ -70,8 +70,14 @@ body {
   font-size: 14px;
 }
 
-.sidebar a:hover, .sidebar a.active {
+.sidebar a.normal:hover, .sidebar a.active {
   background: rgba(255,255,255,0.2);
+  color: white;
+  font-weight: bold;
+  transform: translateX(5px);
+}
+
+.sidebar a.logout:hover {
   color: white;
   transform: translateX(5px);
 }

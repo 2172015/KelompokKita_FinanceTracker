@@ -1,23 +1,37 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\EventSessionController;
-use App\Http\Controllers\RegistrationController;
-use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\AccountController;
+use App\Models\Account;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 Route::prefix('')->middleware(['auth', 'verified'])->group(function () {
-    Route::view('/dashboard', 'index.index')->name('dashboard');
+    // 1. DASHBOARD: Kita ubah jadi Route::get agar bisa kirim data $accounts
+    Route::get('/dashboard', function () {
+        // Ambil data akun user dari database
+        $accounts = Account::where('user_id', Auth::id())->get();
+        // Kirim ke view
+        return view('index/index', compact('accounts')); 
+    })->name('dashboard');
+
+    // 2. ACCOUNT ROUTES: Untuk menampilkan form dan menyimpan data
+    Route::get('/accountcreate', [AccountController::class, 'create'])->name('accountcreate');
+    // Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
+    Route::resource('accounts', AccountController::class);
+
     Route::view('/budgets', 'index.budgets')->name('budgets');
     Route::view('/accounts', 'index.accounts')->name('accounts');
     Route::view('/categories', 'index.categories')->name('categories');
     Route::view('/profile-page', 'index.profile')->name('profile.page');
     Route::view('/reports', 'index.reports')->name('reports');
     Route::view('/transactions', 'index.transactions')->name('transactions');
+    Route::resource('transactions', TransactionController::class);
 });
 
 Route::middleware('auth')->group(function () {
@@ -29,19 +43,5 @@ Route::middleware('auth')->group(function () {
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\SessionController;
-
-// Route::prefix('admin')->middleware(['auth'])->group(function () {
-//     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
-//     Route::resource('events', EventController::class);
-//     Route::resource('sessions', SessionController::class);
-//     Route::resource('registrations', RegistrationController::class)->only(['index', 'show', 'destroy']);
-//     Route::resource('registrations', RegistrationController::class);
-//     Route::resource('attendances', AttendanceController::class);
-//     Route::resource('event-sessions', EventSessionController::class);
-
-//     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-//     Route::post('attendance/scan', [AttendanceController::class, 'scan'])->name('attendance.scan');
-// });
 
 require __DIR__.'/auth.php';
