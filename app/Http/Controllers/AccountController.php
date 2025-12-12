@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -49,20 +50,27 @@ class AccountController extends Controller
     /**
      * Menghapus Akun
      */
-    public function destroy(Account $account)
+    public function destroy($id)
     {
-        // 1. Cek Kepemilikan (Security)
-        // Pastikan user tidak menghapus akun milik orang lain via inspect element
-        if ($account->user_id !== Auth::id()) {
+        // 1. Cari Akun
+        $account = Account::findOrFail($id);
+    
+        // 2. Cek Keamanan (Pastikan milik user yang login)
+        if ($account->user_id != Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
-
-        // 2. Hapus Akun
-        // Karena kita set 'ON DELETE CASCADE' di database, 
-        // semua transaksi terkait akun ini juga akan otomatis terhapus.
-        $account->delete();
-
-        // 3. Kembali ke Dashboard
-        return redirect()->route('dashboard')->with('success', 'Akun berhasil dihapus!');
+    
+        // 3. Gunakan DB Transaction agar aman
+        DB::transaction(function () use ($account) {
+            
+            // LANGKAH PENTING: Hapus semua transaksi milik akun ini terlebih dahulu
+            // Pastikan di Model Account ada relasi public function transactions()
+            $account->transactions()->delete();
+    
+            // Setelah bersih, baru hapus akunnya
+            $account->delete();
+        });
+    
+        return back()->with('success', 'Akun dompet dan seluruh riwayat transaksinya berhasil dihapus.');
     }
 }

@@ -60,39 +60,40 @@
                 </button>
             </form>
             </a>
-          </div>
-    <div class="main-content">
-
-        <div class="header">
-            <h1>Kategori</h1>
-            <button class="btn">Tambah Kategori</button>
         </div>
+    
+        <div class="main-content">
 
-        <div class="table-wrapper">
-            <h3>Daftar Kategori</h3>
-            <table>
-                <tr>
-                    <th>Nama</th>
-                    <th>Tipe</th>
-                    <th>Deskripsi</th>
-                    <th>Aksi</th>
-                </tr>
-                <tr>
-                    <td>Makanan</td>
-                    <td>Pengeluaran</td>
-                    <td>Konsumsi harian</td>
-                    <td>Edit | Hapus</td>
-                </tr>
-                <tr>
-                    <td>Gaji</td>
-                    <td>Pemasukan</td>
-                    <td>Gaji bulanan</td>
-                    <td>Edit | Hapus</td>
-                </tr>
-            </table>
+            <div class="header">
+                <h1>Kategori</h1>
+                <button class="btn">Tambah Kategori</button>
+            </div>
+
+            <div class="table-wrapper">
+                <h3>Daftar Kategori</h3>
+                <table>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Tipe</th>
+                        <th>Deskripsi</th>
+                        <th>Aksi</th>
+                    </tr>
+                    <tr>
+                        <td>Makanan</td>
+                        <td>Pengeluaran</td>
+                        <td>Konsumsi harian</td>
+                        <td>Edit | Hapus</td>
+                    </tr>
+                    <tr>
+                        <td>Gaji</td>
+                        <td>Pemasukan</td>
+                        <td>Gaji bulanan</td>
+                        <td>Edit | Hapus</td>
+                    </tr>
+                </table>
+            </div>
+
         </div>
-
-    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
