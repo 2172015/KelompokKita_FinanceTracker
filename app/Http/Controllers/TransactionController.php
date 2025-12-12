@@ -7,44 +7,60 @@ use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Penting untuk Database Transaction
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
-    /**
-     * Menampilkan daftar transaksi (Read)
-     */
-    public function index()
+    // Halaman Index (Menu Sidebar)
+    public function index(Request $request)
     {
-        // Ambil transaksi milik user yang login, urutkan dari yang terbaru
-        // Gunakan 'with' agar query lebih cepat (Eager Loading)
-        $transactions = Transaction::with(['category', 'account'])
-            ->where('user_id', Auth::id())
-            ->latest('date')
-            ->paginate(10); // Tampilkan 10 per halaman
+        // Mulai query dasar (milik user yang login)
+        $query = Transaction::with(['category', 'account'])
+                    ->whereHas('account', function($q) {
+                        $q->where('user_id', Auth::id());
+                    });
 
-        return view('transactions.index', compact('transactions'));
+        // LOGIKA FILTER:
+        // Jika ada parameter 'account_id' di URL (hasil klik dari dashboard)
+        if ($request->has('account_id') && $request->account_id != null) {
+            $query->where('account_id', $request->account_id);
+        }
+
+        // Ambil data (terurut tanggal terbaru)
+        $transactions = $query->orderBy('date', 'desc')->paginate(10);
+
+        // Kirim juga parameter agar view tahu kita sedang memfilter akun apa (opsional)
+        // append() pada pagination berguna agar saat pindah page 2, filternya tidak hilang
+        $transactions->appends($request->all());
+
+        return view('index/transactions', compact('transactions'));
     }
 
-    /**
-     * Menampilkan form tambah transaksi (Create - View)
-     */
-    public function create()
+    // Halaman Form Create
+    public function create(Request $request)
     {
-        // Kita butuh data Akun dan Kategori untuk pilihan Dropdown
+        // 1. Ambil account_id dari URL (jika ada)
+        $accountId = $request->query('account_id');
+        $selectedAccount = null;
+
+        // 2. Jika ada ID, cari datanya untuk ditampilkan namanya nanti
+        if ($accountId) {
+            $selectedAccount = Account::where('user_id', Auth::id())
+                                    ->where('id', $accountId)
+                                    ->first();
+        }
+
+        // 3. Tetap ambil semua akun (untuk berjaga-jaga jika user masuk lewat sidebar)
         $accounts = Account::where('user_id', Auth::id())->get();
-        $categories = Category::where('user_id', Auth::id())->get();
+        $categories = Category::all(); 
 
-        return view('transactions.create', compact('accounts', 'categories'));
+        return view('index/transactioncreate', compact('accounts', 'categories', 'selectedAccount'));
     }
 
-    /**
-     * Menyimpan transaksi baru ke database (Create - Action)
-     */
+    // Simpan Data (Store)
     public function store(Request $request)
     {
-        // 1. Validasi Input
-        $validated = $request->validate([
+        $request->validate([
             'account_id' => 'required|exists:accounts,id',
             'category_id' => 'required|exists:categories,id',
             'amount' => 'required|numeric|min:1',
@@ -53,62 +69,88 @@ class TransactionController extends Controller
             'notes' => 'nullable|string|max:255',
         ]);
 
-        // 2. Mulai Database Transaction
-        // Fitur ini menjamin: Jika update saldo gagal, transaksi tidak akan tersimpan. (Aman!)
-        DB::transaction(function () use ($validated) {
-            
-            // A. Simpan Transaksi
+        DB::transaction(function () use ($request) {
+            // 1. Simpan Transaksi
             Transaction::create([
-                'user_id' => Auth::id(), // Ambil ID user otomatis
-                'account_id' => $validated['account_id'],
-                'category_id' => $validated['category_id'],
-                'amount' => $validated['amount'],
-                'type' => $validated['type'],
-                'date' => $validated['date'],
-                'notes' => $validated['notes'],
+                'account_id' => $request->account_id,
+                'category_id' => $request->category_id,
+                'amount' => $request->amount,
+                'type' => $request->type,
+                'date' => $request->date,
+                'transaction_notes' => $request->notes,
             ]);
 
-            // B. Update Saldo Akun Otomatis
-            $account = Account::find($validated['account_id']);
-            
-            if ($validated['type'] === 'income') {
-                $account->increment('balance', $validated['amount']); // Tambah Saldo
+            // 2. Update Saldo Akun
+            $account = Account::find($request->account_id);
+            if ($request->type == 'income') {
+                $account->increment('balance', $request->amount);
             } else {
-                $account->decrement('balance', $validated['amount']); // Kurang Saldo
+                $account->decrement('balance', $request->amount);
             }
-            
+
+            // 3. Update Saldo Kategori
+            $category = Category::find($request->category_id);
+            $category->increment('categories_balance', $request->amount);
         });
 
-        // 3. Kembali ke halaman index dengan pesan sukses
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil disimpan!');
+        return redirect()->route('dashboard')->with('success', 'Transaksi berhasil disimpan!');
     }
 
-    /**
-     * Menghapus transaksi (Delete)
-     */
-    public function destroy(Transaction $transaction)
+    public function listByAccount($id)
     {
-        // Pastikan yang menghapus adalah pemilik data (Security Check)
-        if ($transaction->user_id !== Auth::id()) {
-            abort(403);
+        // ... kode validasi akun & user sebelumnya ...
+        $account = Account::findOrFail($id);
+        
+        if ($account->user_id != Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+    
+        $transactions = Transaction::with('category')
+            ->where('account_id', $id)
+            ->orderBy('date', 'desc')
+            ->paginate(10);
+    
+        // PASTIKAN NAMA FILE VIEW SESUAI
+        // Jika file ada di folder: resources/views/index/transactionslist.blade.php
+        return view('index.transactionslist', compact('account', 'transactions'));
+    }
+
+    // Hapus Transaksi (Destroy)
+    public function destroy($id)
+    {
+        // 1. Cari Transaksi berdasarkan ID
+        $transaction = Transaction::findOrFail($id);
+
+        // 2. Keamanan: Cek apakah transaksi ini milik akun user yang sedang login
+        // Kita load relasi account untuk cek user_id
+        if ($transaction->account->user_id != Auth::id()) {
+            abort(403, 'Unauthorized action.');
         }
 
         DB::transaction(function () use ($transaction) {
-            // A. Kembalikan Saldo Akun (Reverse Balance)
-            // Jika hapus Income -> Saldo berkurang
-            // Jika hapus Expense -> Saldo bertambah kembali
-            $account = Account::find($transaction->account_id);
-            
-            if ($transaction->type === 'income') {
+            // 3. Ambil Akun dan Kategori terkait
+            $account = $transaction->account;
+            $category = $transaction->category;
+
+            // 4. LOGIKA PENGEMBALIAN SALDO (Rollback)
+            if ($transaction->type == 'income') {
+                // Jika dulu Pemasukan (uang masuk), maka saat dihapus uang harus DITARIK KEMBALI (dikurangi)
                 $account->decrement('balance', $transaction->amount);
             } else {
+                // Jika dulu Pengeluaran (uang keluar), maka saat dihapus uang harus DIKEMBALIKAN (ditambah)
                 $account->increment('balance', $transaction->amount);
             }
 
-            // B. Hapus Data
+            // 5. Kembalikan saldo kategori (Opsional, agar data sinkron dengan method store)
+            if ($category) {
+                $category->decrement('categories_balance', $transaction->amount);
+            }
+
+            // 6. Hapus Data Transaksi Permanen
             $transaction->delete();
         });
 
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus!');
+        // Redirect kembali ke halaman sebelumnya (bisa dari index atau listByAccount)
+        return back()->with('success', 'Transaksi berhasil dihapus dan saldo telah dikembalikan.');
     }
 }

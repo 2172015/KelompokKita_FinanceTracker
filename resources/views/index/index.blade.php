@@ -26,10 +26,6 @@
           <i class="fa-solid fa-wallet"></i> Transactions
       </a>
   
-      <a href="{{ route('accounts') }}" class="{{ request()->routeIs('accounts*') ? 'active' : '' }} normal">
-          <i class="fa-solid fa-building-columns"></i> Accounts
-      </a>
-  
       <a href="#" class="normal"><i class="fa-solid fa-piggy-bank"></i> Budgets</a>
       <a href="#" class="normal"><i class="fa-solid fa-tags"></i> Categories</a>
       <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
@@ -50,7 +46,6 @@
         <h1>Dashboard</h1>
         <div class="header-actions">
           <div class="me-3">Halo, <strong>{{ Auth::user()->name }}</strong></div>
-          <button class="toggle btn btn-sm btn-outline-secondary me-2" onclick="toggleDark()"><i class="fa-solid fa-moon"></i></button>
         </div>
       </div>
 
@@ -77,25 +72,41 @@
                 <h3 class="text-white-50 fs-6">Total Balance</h3>
                 <p class="text-white fs-3 fw-bold">Rp {{ number_format($totalBalance, 0, ',', '.') }}</p>
             </div>
-        </div>
 
-        <div class="cards">
             @foreach($accounts as $account)
-            <div class="card">
-                <h3><i class="fa-solid fa-building-columns me-2"></i> {{ $account->name }}</h3>
-                <p class="">
-                    Rp {{ number_format($account->balance, 0, ',', '.') }}
-                </p>
-                <form action="{{ route('accounts.destroy', $account->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dompet {{ $account->name }}? Semua transaksi di dalamnya juga akan terhapus.');">
-                  @csrf
-                  @method('DELETE') <button type="submit" class="btn btn-sm btn-light text-danger border-0" title="Hapus Akun">
-                      <i class="fa-solid fa-trash"></i>
-                  </button>
-                </form>
+            <div class="card bg-white p-0 flex-fill shadow-sm position-relative overflow-hidden" style="min-width: 250px; border-radius: 15px; border:none;">
+                
+                <div class="position-absolute top-0 end-0 p-2 z-2">
+                    <form action="{{ route('accounts.destroy', $account->id) }}" method="POST" onsubmit="return confirm('Hapus dompet {{ $account->name }}?');">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-sm text-danger hover-bg-light rounded-circle" style="width:30px; height:30px;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            
+                <a href="{{ route('transactions.list', $account->id) }}" class="text-decoration-none text-dark d-block p-3 h-100">
+                    <h3 class="text-muted fs-6 mb-2 mt-2">
+                        <i class="fa-solid fa-building-columns me-2"></i> {{ $account->name }}
+                    </h3>
+                    <p class="text-success fs-3 fw-bold mb-0">
+                        Rp {{ number_format($account->balance, 0, ',', '.') }}
+                    </p>
+                    <small class="text-muted" style="font-size: 11px;">
+                        <i class="fa-solid fa-list-ul"></i> Klik untuk detail transaksi akun ini
+                    </small>
+                </a>
+            
+                <div class="p-3 pt-0">
+                    <a href="{{ route('transactions.create', ['account_id' => $account->id]) }}" class="btn btn-primary btn-sm w-100 position-relative z-3">
+                        <i class="fa-solid fa-plus"></i> Tambah Transaksi
+                    </a>
+                </div>
+            
             </div>
             @endforeach
 
-            <a href="{{ route('accountcreate') }}" class="card d-flex align-items-center justify-content-center text-decoration-none bg-light border-dashed flex-fill" style="min-width: 200px; border-radius: 15px; border: 2px dashed #ccc;">
+            <a href="{{ route('accounts.create') }}" class="card d-flex align-items-center justify-content-center text-decoration-none bg-light border-dashed flex-fill" style="min-width: 200px; border-radius: 15px; border: 2px dashed #ccc;">
                 <div class="text-center text-muted p-3">
                     <i class="fa-solid fa-plus fa-2x mb-2"></i>
                     <h5 class="m-0 fs-6">Add Account</h5>
@@ -105,27 +116,69 @@
 
         <div class="table-wrapper mt-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3>Recent Transactions</h3>
-                <a href="{{ route('transactions.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                <h3 class="mb-0">Recent Transactions</h3>
+                <a href="{{ route('transactions.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
             </div>
             
-            <table class="table">
-            <thead>
-                <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                <td colspan="4" class="text-center text-muted py-4">
-                    <i>Data transaksi akan muncul di sini.</i>
-                </td>
-                </tr>
-            </tbody>
-            </table>
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-secondary" style="font-weight: 600; font-size: 0.9rem;">Date</th>
+                                <th class="py-3 text-secondary" style="font-weight: 600; font-size: 0.9rem;">Description</th>
+                                <th class="py-3 text-secondary" style="font-weight: 600; font-size: 0.9rem;">Category</th>
+                                <th class="pe-4 py-3 text-end text-secondary" style="font-weight: 600; font-size: 0.9rem;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentTransactions as $transaction)
+                            <tr>
+                                <td class="ps-4 text-muted" style="font-size: 0.9rem;">
+                                    {{ \Carbon\Carbon::parse($transaction->date)->format('d M Y') }}
+                                </td>
+
+                                <td>
+                                    <div class="fw-bold text-dark">{{ $transaction->description }}</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-wallet me-1 text-primary opacity-50"></i> 
+                                        {{ $transaction->account->name ?? 'Unknown Account' }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="badge rounded-pill fw-normal px-3 py-2" 
+                                          style="background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;">
+                                        {{ $transaction->category->name ?? 'Uncategorized' }}
+                                    </span>
+                                </td>
+
+                                <td class="text-end pe-4 fw-bold">
+                                    @if($transaction->type == 'income')
+                                        <span class="text-success">
+                                            + Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                        </span>
+                                    @else
+                                        <span class="text-danger">
+                                            - Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted opacity-50 mb-2">
+                                        <i class="fa-solid fa-receipt fa-3x"></i>
+                                    </div>
+                                    <p class="text-muted m-0">Belum ada transaksi terbaru.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
       </div>
 
