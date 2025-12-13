@@ -30,4 +30,10 @@ class Account extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function budget()
+{
+    // hasOne artinya satu akun cuma punya satu budget
+    return $this->hasOne(Budget::class);
+}
 }

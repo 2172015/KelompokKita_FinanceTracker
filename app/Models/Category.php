@@ -26,10 +26,4 @@ class Category extends Model
     {
         return $this->hasMany(Transaction::class);
     }
-
-    // Relasi: Kategori memiliki banyak Budget (One to Many)
-    public function budgets()
-    {
-        return $this->hasMany(Budget::class);
-    }
 }

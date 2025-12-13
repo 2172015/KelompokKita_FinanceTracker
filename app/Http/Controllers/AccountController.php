@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Models\Budget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,21 +31,32 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input
         $request->validate([
-            'name' => 'required|string|max:100', // Nama wajib diisi
-            'balance' => 'required|numeric|min:0', // Saldo wajib angka & tidak boleh minus
+            'name' => 'required|string|max:50',
+            'balance' => 'required|numeric|min:0',
+            // Validasi lain...
         ]);
-
-        // 2. Simpan ke Database
-        Account::create([
-            'user_id' => Auth::id(), // Ambil ID user yang sedang login
+    
+        // 1. Simpan Akun
+        $account = Account::create([
+            'user_id' => Auth::id(),
             'name' => $request->name,
             'balance' => $request->balance,
+            // field lain...
         ]);
-
-        // 3. Redirect kembali ke Dashboard dengan pesan sukses
-        return redirect()->route('dashboard')->with('success', 'Akun berhasil dibuat!');
+    
+        // 2. OTOMATIS: Buat Budget Default (0 Rupiah dulu, nanti diedit user)
+        Budget::create([
+            'account_id' => $account->id,
+            'name' => 'Budget ' . $account->name,
+            'maximum_expense' => 0, // Default 0
+            'target_balance' => 0,
+            'minimum_balance' => 0,
+            'starting_balance' => 0,
+            'budgets_notes' => 'Auto-generated budget',
+        ]);
+    
+        return redirect()->route('dashboard')->with('success', 'Akun dan Budget berhasil dibuat!');
     }
 
     /**

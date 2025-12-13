@@ -33,7 +33,7 @@ class TransactionController extends Controller
         // append() pada pagination berguna agar saat pindah page 2, filternya tidak hilang
         $transactions->appends($request->all());
 
-        return view('index/transactions', compact('transactions'));
+        return view('index/transactions/transactions', compact('transactions'));
     }
 
     // Halaman Form Create
@@ -52,9 +52,9 @@ class TransactionController extends Controller
 
         // 3. Tetap ambil semua akun (untuk berjaga-jaga jika user masuk lewat sidebar)
         $accounts = Account::where('user_id', Auth::id())->get();
-        $categories = Category::all(); 
+        $categories = Category::where('user_id', Auth::id())->get();
 
-        return view('index/transactioncreate', compact('accounts', 'categories', 'selectedAccount'));
+        return view('index/transactions/transactioncreate', compact('accounts', 'categories', 'selectedAccount'));
     }
 
     // Simpan Data (Store)
@@ -112,7 +112,7 @@ class TransactionController extends Controller
     
         // PASTIKAN NAMA FILE VIEW SESUAI
         // Jika file ada di folder: resources/views/index/transactionslist.blade.php
-        return view('index.transactionslist', compact('account', 'transactions'));
+        return view('index/transactions/transactionslist', compact('account', 'transactions'));
     }
 
     // Hapus Transaksi (Destroy)
