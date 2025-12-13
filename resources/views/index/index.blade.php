@@ -16,29 +16,30 @@
   <div class="layout-container">
     
     <div class="sidebar">
-      <h2>FINANCE</h2>
-  
-      <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
-          <i class="fa-solid fa-gauge"></i> Dashboard
-      </a>
-  
-      <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
-          <i class="fa-solid fa-wallet"></i> Transactions
-      </a>
-  
-      <a href="#" class="normal"><i class="fa-solid fa-piggy-bank"></i> Budgets</a>
-      <a href="#" class="normal"><i class="fa-solid fa-tags"></i> Categories</a>
-      <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
-      <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
-  
-      <div class="logout-wrapper" style="margin-top: auto;">
-          <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="btn btn-danger w-100 text-start">
-                  <i class="fa-solid fa-right-from-bracket"></i> Logout
-              </button>
-          </form>
-      </div>
+        <h2>FINANCE</h2>
+    
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
+            <i class="fa-solid fa-gauge"></i> Dashboard
+        </a>
+    
+        <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
+            <i class="fa-solid fa-wallet"></i> Transactions
+        </a>
+      
+        <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories*') ? 'active' : '' }} normal">
+          <i class="fa-solid fa-tags"></i> Categories
+        </a>
+        <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+        <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
+    
+        <div class="logout-wrapper" style="margin-top: auto;">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-danger w-100 text-start">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </form>
+        </div>
     </div>
   
     <div class="main-content">
@@ -74,32 +75,92 @@
             </div>
 
             @foreach($accounts as $account)
-            <div class="card bg-white p-0 flex-fill shadow-sm position-relative overflow-hidden" style="min-width: 250px; border-radius: 15px; border:none;">
-                
-                <div class="position-absolute top-0 end-0 p-2 z-2">
+            <div class="card bg-white p-0 flex-fill shadow-sm position-relative overflow-hidden" style="min-width: 320px; border-radius: 15px; border:none;">
+    
+                <div class="position-absolute top-0 end-0 p-2 z-2 d-flex gap-1">
+                    @if($account->budget)
+                    <a href="{{ route('budgets.edit', $account->budget->id) }}" class="btn btn-sm btn-light text-primary rounded-circle shadow-sm" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;" title="Edit Budget">
+                        <i class="fa-solid fa-gear"></i>
+                    </a>
+                    @endif
+                    
                     <form action="{{ route('accounts.destroy', $account->id) }}" method="POST" onsubmit="return confirm('Hapus dompet {{ $account->name }}?');">
                         @csrf @method('DELETE')
-                        <button type="submit" class="btn btn-sm text-danger hover-bg-light rounded-circle" style="width:30px; height:30px;">
+                        <button type="submit" class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" style="width:30px; height:30px;">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </form>
                 </div>
             
-                <a href="{{ route('transactions.list', $account->id) }}" class="text-decoration-none text-dark d-block p-3 h-100">
-                    <h3 class="text-muted fs-6 mb-2 mt-2">
-                        <i class="fa-solid fa-building-columns me-2"></i> {{ $account->name }}
+                <a href="{{ route('transactions.list', $account->id) }}" class="text-decoration-none text-dark d-block p-3">
+                    
+                    <h3 class="text-muted fs-6 mb-1 mt-1">
+                        <i class="fa-solid fa-wallet me-2"></i> {{ $account->name }}
                     </h3>
-                    <p class="text-success fs-3 fw-bold mb-0">
-                        Rp {{ number_format($account->balance, 0, ',', '.') }}
-                    </p>
-                    <small class="text-muted" style="font-size: 11px;">
-                        <i class="fa-solid fa-list-ul"></i> Klik untuk detail transaksi akun ini
-                    </small>
+                    
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="text-dark fs-3 fw-bold">
+                            Rp {{ number_format($account->balance, 0, ',', '.') }}
+                        </span>
+                        @if($account->is_low_balance)
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill" style="font-size: 10px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Low Balance
+                            </span>
+                        @endif
+                    </div>
+            
+                    @if($account->budget)
+                    <div class="bg-light p-3 rounded-3 border">
+                        
+                        @if($account->budget->maximum_expense > 0)
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="small fw-bold text-muted"><i class="fa-solid fa-arrow-trend-down me-1"></i> Pengeluaran</span>
+                                <span class="small text-muted">{{ number_format($account->expense_pct, 0) }}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar {{ $account->expense_pct > 100 ? 'bg-danger' : 'bg-warning' }}" 
+                                     role="progressbar" 
+                                     style="width: {{ min($account->expense_pct, 100) }}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1" style="font-size: 10px;">
+                                <span class="text-muted">Used: {{ number_format($account->spent_amount/1000, 0) }}k</span>
+                                <span class="text-muted">Max: {{ number_format($account->budget->maximum_expense/1000, 0) }}k</span>
+                            </div>
+                        </div>
+                        @endif
+            
+                        @if($account->budget->target_balance > 0)
+                        <div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="small fw-bold text-muted"><i class="fa-solid fa-bullseye me-1"></i> Target Saldo</span>
+                                <span class="small text-success">{{ number_format($account->target_pct, 0) }}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" 
+                                     role="progressbar" 
+                                     style="width: {{ min($account->target_pct, 100) }}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1" style="font-size: 10px;">
+                                <span class="text-muted">Now: {{ number_format($account->balance/1000, 0) }}k</span>
+                                <span class="text-muted">Goal: {{ number_format($account->budget->target_balance/1000, 0) }}k</span>
+                            </div>
+                        </div>
+                        @endif
+            
+                        @if($account->budget->maximum_expense == 0 && $account->budget->target_balance == 0)
+                            <div class="text-center py-2">
+                                <small class="text-muted fst-italic">Belum ada target diatur.</small>
+                            </div>
+                        @endif
+            
+                    </div>
+                    @endif
                 </a>
             
                 <div class="p-3 pt-0">
-                    <a href="{{ route('transactions.create', ['account_id' => $account->id]) }}" class="btn btn-primary btn-sm w-100 position-relative z-3">
-                        <i class="fa-solid fa-plus"></i> Tambah Transaksi
+                    <a href="{{ route('transactions.create', ['account_id' => $account->id]) }}" class="btn btn-outline-primary btn-sm w-100 position-relative z-3">
+                        <i class="fa-solid fa-plus"></i> Transaksi Baru
                     </a>
                 </div>
             

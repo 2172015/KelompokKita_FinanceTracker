@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CategoryController;
 use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Route;
@@ -15,21 +17,49 @@ Route::get('/', function () {
 Route::prefix('')->middleware(['auth', 'verified'])->group(function () {
     // 1. DASHBOARD: Kita ubah jadi Route::get agar bisa kirim data $accounts
     Route::get('/dashboard', function () {
-        // 1. Ambil User yang sedang login
         $user = Auth::user();
+        $accounts = $user->accounts->load('budget'); 
         
-        // 2. Ambil data Akun/Dompet milik user
-        $accounts = $user->accounts; 
+        foreach ($accounts as $account) {
+            // 1. HITUNG PENGELUARAN (Untuk Maximum Expense)
+            $spent = App\Models\Transaction::where('account_id', $account->id)
+                                ->where('type', 'expense')
+                                ->sum('amount');
+            $account->spent_amount = $spent;
+    
+            // Persentase Pengeluaran (Expense vs Max Limit)
+            if ($account->budget && $account->budget->maximum_expense > 0) {
+                $account->expense_pct = ($spent / $account->budget->maximum_expense) * 100;
+            } else {
+                $account->expense_pct = 0;
+            }
+    
+            // 2. HITUNG PENCAPAIAN TARGET (Current Balance vs Target)
+            // Balance otomatis berubah jika ada transaksi income/expense
+            if ($account->budget && $account->budget->target_balance > 0) {
+                $account->target_pct = ($account->balance / $account->budget->target_balance) * 100;
+            } else {
+                $account->target_pct = 0;
+            }
+    
+            // 3. CEK SALDO MINIMUM
+            // True jika saldo saat ini KURANG DARI batas minimum
+            $account->is_low_balance = false;
+            if ($account->budget && $account->budget->minimum_balance > 0) {
+                if ($account->balance < $account->budget->minimum_balance) {
+                    $account->is_low_balance = true;
+                }
+            }
+        }
         
-        // 3. Ambil 5 Transaksi Terakhir dari semua akun user tersebut
-        $recentTransactions = Transaction::whereIn('account_id', $accounts->pluck('id'))
-                                ->with(['category', 'account']) // Load relasi agar efisien
-                                ->latest('date') // Urutkan dari yang terbaru
-                                ->take(5) // Batasi hanya 5
+        // ... logic recent transactions (tetap sama) ...
+        $recentTransactions = App\Models\Transaction::whereIn('account_id', $accounts->pluck('id'))
+                                ->with(['category', 'account'])
+                                ->latest('date')
+                                ->take(5)
                                 ->get();
     
-        // 4. Kirim kedua variabel ($accounts dan $recentTransactions) ke view
-        return view('index/index', compact('accounts', 'recentTransactions'));
+        return view('index.index', compact('accounts', 'recentTransactions'));
     })->middleware(['auth', 'verified'])->name('dashboard');
 
     // 2. ACCOUNT ROUTES: Untuk menampilkan form dan menyimpan data
@@ -37,9 +67,11 @@ Route::prefix('')->middleware(['auth', 'verified'])->group(function () {
     // Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
     Route::resource('accounts', AccountController::class);
 
-    Route::view('/budgets', 'index.budgets')->name('budgets');
+    // Route::view('/budgets', 'index.budgets')->name('budgets');
+    Route::resource('budgets', BudgetController::class);
     Route::view('/accounts', 'index.accounts')->name('accounts');
-    Route::view('/categories', 'index.categories')->name('categories');
+    // Route::view('/categories', 'index.categories')->name('categories');
+    Route::resource('categories', CategoryController::class);
     Route::view('/profile-page', 'index.profile')->name('profile.page');
     Route::view('/reports', 'index.reports')->name('reports');
     // Route::get('/transactions', 'index.transactions')->name('transactions');

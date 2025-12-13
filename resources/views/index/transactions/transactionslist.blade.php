@@ -25,9 +25,10 @@
       <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
           <i class="fa-solid fa-wallet"></i> Transactions
       </a>
-  
-      <a href="#" class="normal"><i class="fa-solid fa-piggy-bank"></i> Budgets</a>
-      <a href="#" class="normal"><i class="fa-solid fa-tags"></i> Categories</a>
+    
+      <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories*') ? 'active' : '' }} normal">
+        <i class="fa-solid fa-tags"></i> Categories
+      </a>
       <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
       <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
   
@@ -39,7 +40,7 @@
               </button>
           </form>
       </div>
-    </div>
+  </div>
   
     <div class="main-content">
         <div class="table-wrapper bg-white p-4 rounded shadow-sm">

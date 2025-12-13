@@ -10,7 +10,7 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         // Sesuaikan dengan ID user Anda (misal ID 1)
-        $userId = 1; 
+        $userId = 2; 
 
         $categories = [
             ['name' => 'Gaji', 'user_id' => $userId, 'categories_balance' => 0],

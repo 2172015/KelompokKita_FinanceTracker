@@ -16,29 +16,30 @@
   <div class="layout-container">
     
     <div class="sidebar">
-      <h2>FINANCE</h2>
-  
-      <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
-          <i class="fa-solid fa-gauge"></i> Dashboard
-      </a>
-  
-      <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
-          <i class="fa-solid fa-wallet"></i> Transactions
-      </a>
-  
-      <a href="#" class="normal"><i class="fa-solid fa-piggy-bank"></i> Budgets</a>
-      <a href="#" class="normal"><i class="fa-solid fa-tags"></i> Categories</a>
-      <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
-      <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
-  
-      <div class="logout-wrapper" style="margin-top: auto;">
-          <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="btn btn-danger w-100 text-start">
-                  <i class="fa-solid fa-right-from-bracket"></i> Logout
-              </button>
-          </form>
-      </div>
+        <h2>FINANCE</h2>
+    
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
+            <i class="fa-solid fa-gauge"></i> Dashboard
+        </a>
+    
+        <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
+            <i class="fa-solid fa-wallet"></i> Transactions
+        </a>
+      
+        <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories*') ? 'active' : '' }} normal">
+          <i class="fa-solid fa-tags"></i> Categories
+        </a>
+        <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+        <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
+    
+        <div class="logout-wrapper" style="margin-top: auto;">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-danger w-100 text-start">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </form>
+        </div>
     </div>
   
     <div class="main-content">

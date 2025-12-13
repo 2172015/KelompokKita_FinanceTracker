@@ -24,6 +24,7 @@ body {
   color: var(--text);
   transition: 0.3s ease;
   margin: 0;
+  overflow: hidden; /* Tambahkan ini: Mencegah body scroll */
 }
 
 /* ===== LAYOUT ===== */
@@ -35,8 +36,9 @@ body {
 
 .layout-container { 
   display: flex; 
-  min-height: 100vh; 
+  height: 100vh; /* Ubah min-height jadi height (Tinggi pas 1 layar) */
   flex-direction: row;
+  overflow: hidden; /* Pastikan tidak ada yang bocor keluar layout */
 }
 
 /* ===== SIDEBAR ===== */
@@ -48,6 +50,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  /* Tambahan: Jika menu sidebar panjang, dia bisa scroll sendiri */
+  overflow-y: auto; 
+  height: 100%;
 }
 
 .sidebar h2 {
@@ -82,8 +87,30 @@ body {
   transform: translateX(5px);
 }
 
+.sidebar::-webkit-scrollbar,
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+}
+
 /* ===== MAIN CONTENT ===== */
-.main-content { flex: 1; padding: 32px; }
+.main-content { 
+  flex: 1; 
+  padding: 32px; 
+  /* Tambahkan kode di bawah ini */
+  height: 100vh; /* Tinggi penuh */
+  overflow-y: auto; /* Mengaktifkan scroll hanya di area ini */
+}
 
 /* ===== HEADER ===== */
 .header {
