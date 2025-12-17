@@ -5,6 +5,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReportController;
 use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Route;
@@ -73,12 +74,14 @@ Route::prefix('')->middleware(['auth', 'verified'])->group(function () {
     // Route::view('/categories', 'index.categories')->name('categories');
     Route::resource('categories', CategoryController::class);
     Route::view('/profile-page', 'index.profile')->name('profile.page');
-    Route::view('/reports', 'index.reports')->name('reports');
+    // Route::view('/reports', 'index.reports')->name('reports');
     // Route::get('/transactions', 'index.transactions')->name('transactions');
     Route::resource('transactions', TransactionController::class);
 
     Route::get('/accounts/{id}/transactions', [TransactionController::class, 'listByAccount'])
     ->name('transactions.list');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 Route::middleware('auth')->group(function () {

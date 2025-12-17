@@ -20,12 +20,54 @@
 
 body {
     font-family: "Poppins", sans-serif;
-    background: var(--bg);
+    /* Warna dasar */
+    background-color: #f3f4f6;
     color: var(--text);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    position: relative; /* Penting untuk dekorasi background */
+    overflow: hidden;   /* Agar dekorasi tidak bikin scroll */
+}
+
+/* Dekorasi Bola Ungu di Kiri Atas */
+body::before {
+    content: "";
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #4f46e5, #818cf8);
+    border-radius: 50%;
+    top: -100px;
+    left: -100px;
+    filter: blur(80px); /* Efek Blur Kuat */
+    opacity: 0.4;
+    z-index: -1; /* Di belakang kartu */
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Dekorasi Bola Pink/Ungu di Kanan Bawah */
+body::after {
+    content: "";
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: linear-gradient(135deg, #c084fc, #6366f1);
+    border-radius: 50%;
+    bottom: -50px;
+    right: -50px;
+    filter: blur(80px);
+    opacity: 0.4;
+    z-index: -1;
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+/* Animasi agar background bergerak halus */
+@keyframes float {
+    0% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(20px) scale(1.05); }
+    100% { transform: translateY(0px) scale(1); }
 }
 
 /* =========================================

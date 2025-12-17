@@ -14,18 +14,18 @@ class Budget extends Model
     protected $fillable = [
         'account_id',       // Kunci utama relasi
         'name',
-        'maximum_expense',  // Batas pengeluaran untuk akun ini
+        'starting_balance',
         'target_balance',   // (Opsional) Target saldo yang ingin dicapai
+        'maximum_expense',  // Batas pengeluaran untuk akun ini
         'minimum_balance',  // (Opsional) Saldo minimal jaga-jaga
         'budgets_notes',
-        // 'category_id' -> DIHAPUS karena user minta connect ke Account saja
-        'starting_balance'
     ];
 
     protected $casts = [
-        'maximum_expense' => 'decimal:2',
-        'target_balance' => 'decimal:2',
-        'minimum_balance' => 'decimal:2',
+        'starting_balance' => 'decimal:2',
+        'target_balance'   => 'decimal:2',
+        'maximum_expense'  => 'decimal:2',
+        'minimum_balance'  => 'decimal:2',
     ];
 
     // Relasi: Budget terhubung ke satu Kategori

@@ -15,6 +15,10 @@ class Category extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'categories_balance' => 'decimal:2',
+    ];
+
     // Relasi: Kategori dimiliki oleh satu User
     public function user()
     {

@@ -9,14 +9,14 @@ class Account extends Model
 {
     use HasFactory;
 
-    // Menonaktifkan timestamps jika tabel tidak punya created_at/updated_at
-    // Tapi di script Anda tabel ini TIDAK punya timestamp, jadi set false.
-    public $timestamps = false;
-
     protected $fillable = [
         'name',
         'balance',
         'user_id',
+    ];
+
+    protected $casts = [
+        'balance' => 'decimal:2',
     ];
 
     // Relasi: Akun dimiliki oleh satu User (Inverse One to Many)

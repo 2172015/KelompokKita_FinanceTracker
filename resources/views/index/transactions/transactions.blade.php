@@ -1,139 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Transactions - Finance Tracker</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  
-  <link rel="stylesheet" href="{{ asset('dist/css/style.css') }}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@extends('layouts.app')
 
-<body>
-  <div class="layout-container">
-    
-    <div class="sidebar">
-        <h2>FINANCE</h2>
-    
-        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
-            <i class="fa-solid fa-gauge"></i> Dashboard
-        </a>
-    
-        <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
-            <i class="fa-solid fa-wallet"></i> Transactions
-        </a>
-      
-        <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories*') ? 'active' : '' }} normal">
-          <i class="fa-solid fa-tags"></i> Categories
-        </a>
-        <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
-        <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
-    
-        <div class="logout-wrapper" style="margin-top: auto;">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn btn-danger w-100 text-start">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
-            </form>
+@section('title', 'Transactions - Finance Tracker')
+
+@section('content')
+
+    <div class="header mb-4">
+        <div>
+            <h1 class="mb-1">Transactions</h1>
+            <p class="text-muted m-0 small">Riwayat semua pemasukan dan pengeluaran Anda.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ route('transactions.create') }}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                <i class="fa-solid fa-plus me-2"></i> Transaksi Baru
+            </a>
         </div>
     </div>
-  
-    <div class="main-content">
-      <div class="header">
-        <h1>Transactions</h1>
-        <div class="header-actions">
-            <a href="{{ route('transactions.create') }}" class="btn btn-primary">
-                <i class="fa-solid fa-plus"></i> Transaksi Baru
-           </a>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="background-color: #d1fae5; color: #065f46;">
+            <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-      </div>
+    @endif
 
-      @if(session('success'))
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-        @endif
-
-        @if(request('account_id'))
-        <div class="alert alert-info d-flex justify-content-between align-items-center mb-3">
+    @if(request('account_id'))
+        <div class="alert alert-info border-0 shadow-sm d-flex justify-content-between align-items-center mb-4" style="background-color: #e0f2fe; color: #0369a1;">
             <span><i class="fa-solid fa-filter me-2"></i> Menampilkan transaksi untuk akun terpilih saja.</span>
-            <a href="{{ route('transactions.index') }}" class="btn btn-sm btn-light">Reset Filter</a>
+            <a href="{{ route('transactions.index') }}" class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3">Reset Filter</a>
         </div>
-        @endif
+    @endif
 
-        <div class="table-wrapper bg-white p-4 rounded shadow-sm">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Deskripsi</th>
-                            <th>Kategori</th>
-                            <th>Akun Dompet</th> <th>Nominal</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($transactions as $transaction)
-                        <tr>
-                            <td>{{ \Carbon\Carbon::parse($transaction->date)->format('d M Y') }}</td>
-                            
-                            <td>{{ $transaction->transaction_notes ?? '-' }}</td>
-                            
-                            <td>
-                                <span class="badge bg-secondary rounded-pill px-3">
-                                    {{ $transaction->category->name ?? 'Umum' }}
-                                </span>
-                            </td>
-                            
-                            <td>
-                                <i class="fa-solid fa-wallet text-muted me-1"></i>
+    <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-secondary text-uppercase" style="font-size: 11px; font-weight: 700;">Tanggal</th>
+                        <th class="py-3 text-secondary text-uppercase" style="font-size: 11px; font-weight: 700;">Deskripsi</th>
+                        <th class="py-3 text-secondary text-uppercase" style="font-size: 11px; font-weight: 700;">Kategori</th>
+                        <th class="py-3 text-secondary text-uppercase" style="font-size: 11px; font-weight: 700;">Akun Dompet</th> 
+                        <th class="py-3 text-secondary text-uppercase text-end pe-4" style="font-size: 11px; font-weight: 700;">Nominal</th>
+                        <th class="py-3 text-secondary text-uppercase text-center" style="font-size: 11px; font-weight: 700;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($transactions as $transaction)
+                    <tr>
+                        <td class="ps-4 text-muted" style="font-size: 13px;">
+                            {{ \Carbon\Carbon::parse($transaction->date)->format('d M Y') }}
+                        </td>
+                        
+                        <td>
+                            <div class="fw-bold text-dark">{{ $transaction->transaction_notes ?? '-' }}</div>
+                        </td>
+                        
+                        <td>
+                            <span class="badge rounded-pill fw-normal px-3 py-2" style="background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;">
+                                {{ $transaction->category->name ?? 'Umum' }}
+                            </span>
+                        </td>
+                        
+                        <td>
+                            <div class="small text-muted">
+                                <i class="fa-solid fa-wallet text-primary opacity-50 me-1"></i>
                                 {{ $transaction->account->name ?? 'Deleted Account' }}
-                            </td>
-                            
-                            <td class="{{ $transaction->type == 'income' ? 'text-success' : 'text-danger' }}">
+                            </div>
+                        </td>
+                        
+                        <td class="text-end pe-4">
+                            <span class="fw-bold {{ $transaction->type == 'income' ? 'text-success' : 'text-danger' }}">
                                 {{ $transaction->type == 'income' ? '+' : '-' }} 
                                 Rp {{ number_format($transaction->amount, 0, ',', '.') }}
-                            </td>
-                            
-                            <td>
-                                <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi ini? Saldo akun akan dikembalikan.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-link text-danger p-0" title="Hapus">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" style="width: 60px; opacity: 0.5;" class="mb-3">
-                                <br>
-                                Belum ada riwayat transaksi apapun.
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                            </span>
+                        </td>
+                        
+                        <td class="text-center">
+                            <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi ini? Saldo akun akan dikembalikan.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;" title="Hapus">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <div class="mb-3 opacity-25">
+                                <i class="fa-solid fa-receipt fa-3x"></i>
+                            </div>
+                            <h5 class="text-muted fw-bold">Belum ada transaksi.</h5>
+                            <p class="small text-muted">Silakan tambah transaksi baru.</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-                <div class="mt-4">
-                    {{ $transactions->links() }}
-                </div>
+        @if($transactions->hasPages())
+            <div class="card-footer bg-white border-0 py-3 d-flex justify-content-end">
+                {{ $transactions->links() }}
             </div>
-      </div>
-  </div>
+        @endif
+    </div>
 
-  <script>
-    function toggleDark() { document.body.classList.toggle('dark'); }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+@endsection
