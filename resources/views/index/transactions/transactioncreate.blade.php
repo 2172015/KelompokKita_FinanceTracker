@@ -1,107 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Finance Tracker</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  
-  <link rel="stylesheet" href="{{ asset('dist/css/style.css') }}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@extends('layouts.app')
 
-<body>
-  <div class="layout-container">
-    
-    <div class="sidebar">
-        <h2>FINANCE</h2>
-    
-        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
-            <i class="fa-solid fa-gauge"></i> Dashboard
-        </a>
-    
-        <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
-            <i class="fa-solid fa-wallet"></i> Transactions
-        </a>
-      
-        <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories*') ? 'active' : '' }} normal">
-          <i class="fa-solid fa-tags"></i> Categories
-        </a>
-        <a href="#" class="normal"><i class="fa-solid fa-chart-pie"></i> Reports</a>
-        <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
-    
-        <div class="logout-wrapper" style="margin-top: auto;">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn btn-danger w-100 text-start">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
-            </form>
+@section('title', 'New Transaction - Finance Tracker')
+
+@section('content')
+
+    <div class="header mb-4">
+        <div>
+            <h1 class="mb-1">New Transaction</h1>
+            <p class="text-muted m-0 small">Catat pemasukan atau pengeluaran baru.</p>
+        </div>
+        <div class="header-actions">
+            <div class="me-3">Halo, <strong>{{ Auth::user()->name }}</strong></div>
         </div>
     </div>
-  
-    <div class="main-content">
-        <div class="header">
-            <h1>New Transaction</h1>
-            <div class="header-actions">
-            <div class="me-3">Halo, <strong>{{ Auth::user()->name }}</strong></div>
-            <button class="toggle btn btn-sm btn-outline-secondary me-2" onclick="toggleDark()"><i class="fa-solid fa-moon"></i></button>
-            <a href="{{ route('transactions.index') }}" class="btn btn-secondary">
-                <i class="fa-solid fa-arrow-left"></i> Kembali
-            </a>
-            </div>
-        </div>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body p-5">
-                        
-                        <form action="{{ route('transactions.store') }}" method="POST">
-                            @csrf
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7"> 
+            
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="text-center mb-5">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary mb-3" style="width: 70px; height: 70px;">
+                            <i class="fa-solid fa-receipt fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1">Catat Transaksi</h4>
+                        <span class="badge bg-light text-secondary border rounded-pill px-3">Entry Data</span>
+                    </div>
 
-                            <div class="mb-4">
-                                <label for="date" class="form-label">Tanggal Transaksi</label>
-                                <input type="date" class="form-control @error('date') is-invalid @enderror" id="date" name="date" value="{{ old('date', date('Y-m-d')) }}">
-                                @error('date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                    <form action="{{ route('transactions.store') }}" method="POST">
+                        @csrf
+
+                        <div class="mb-4">
+                            <label class="form-label-custom">TANGGAL TRANSAKSI</label>
+                            <div class="input-group-soft">
+                                <span class="input-group-text"><i class="fa-regular fa-calendar"></i></span>
+                                <input type="date" 
+                                       class="form-control" 
+                                       name="date" 
+                                       value="{{ old('date', date('Y-m-d')) }}">
                             </div>
+                            @error('date') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
 
-                            <div class="mb-4">
-                                <label class="form-label d-block">Jenis Transaksi</label>
-                                <div class="btn-group w-100" role="group">
-                                    
-                                    <input type="radio" class="btn-check" name="type" id="income" value="income" {{ old('type') == 'income' ? 'checked' : '' }}>
-                                    <label class="btn btn-outline-success py-2" for="income">
-                                        <i class="fa-solid fa-arrow-up"></i> Pemasukan
-                                    </label>
+                        <div class="mb-4">
+                            <label class="form-label-custom">JENIS TRANSAKSI</label>
+                            <div class="btn-group w-100" role="group">
                                 
-                                    <input type="radio" class="btn-check" name="type" id="expense" value="expense" {{ old('type') == 'expense' ? 'checked' : 'checked' }}>
-                                    <label class="btn btn-outline-danger py-2" for="expense">
-                                        <i class="fa-solid fa-arrow-down"></i> Pengeluaran
-                                    </label>
-                                </div>
-                                @error('type') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                <input type="radio" class="btn-check" name="type" id="income" value="income" {{ old('type') == 'income' ? 'checked' : '' }}>
+                                <label class="btn btn-outline-success py-3 fw-bold rounded-start-3 border-2" for="income">
+                                    <i class="fa-solid fa-arrow-trend-up me-2"></i> Pemasukan
+                                </label>
+                            
+                                <input type="radio" class="btn-check" name="type" id="expense" value="expense" {{ old('type') == 'expense' ? 'checked' : 'checked' }}>
+                                <label class="btn btn-outline-danger py-3 fw-bold rounded-end-3 border-2" for="expense">
+                                    <i class="fa-solid fa-arrow-trend-down me-2"></i> Pengeluaran
+                                </label>
                             </div>
+                            @error('type') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
 
-                            <div class="mb-4">
-                                <label for="amount" class="form-label">Nominal (Rp)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number" class="form-control @error('amount') is-invalid @enderror" id="amount" name="amount" placeholder="0" value="{{ old('amount') }}" min="0">
-                                </div>
-                                @error('amount')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
+                        <div class="mb-4">
+                            <label class="form-label-custom">NOMINAL (IDR)</label>
+                            <div class="input-group-soft">
+                                <span class="input-group-text fw-bold">Rp</span>
+                                <input type="number" 
+                                       class="form-control fw-bold fs-5" 
+                                       name="amount" 
+                                       placeholder="0" 
+                                       value="{{ old('amount') }}" 
+                                       min="0"
+                                       onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                             </div>
+                            @error('amount') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <label for="category_id" class="form-label">Kategori</label>
-                                    <select class="form-select @error('category_id') is-invalid @enderror" name="category_id" id="category_id">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label-custom">KATEGORI</label>
+                                <div class="input-group-soft">
+                                    <span class="input-group-text"><i class="fa-solid fa-layer-group"></i></span>
+                                    <select class="form-control form-select border-0 shadow-none bg-transparent" name="category_id" style="cursor: pointer;">
                                         <option value="" disabled selected>-- Pilih Kategori --</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
@@ -109,23 +88,24 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('category_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
+                                @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            </div>
 
-                                <div class="col-md-6 mb-4">
-                                    <label for="account_id" class="form-label">Akun / Dompet</label>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label-custom">AKUN DOMPET</label>
                                 
-                                    @if(isset($selectedAccount))
-                                        <input type="text" class="form-control bg-light" value="{{ $selectedAccount->name }}" readonly>
-                                        
+                                @if(isset($selectedAccount))
+                                    <div class="input-group-soft bg-light">
+                                        <span class="input-group-text"><i class="fa-solid fa-lock text-muted"></i></span>
+                                        <input type="text" class="form-control text-muted" value="{{ $selectedAccount->name }}" readonly>
                                         <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
-                                        
-                                        <small class="text-muted"><i class="fa-solid fa-lock"></i> Akun otomatis terpilih</small>
-                                
-                                    @else
-                                        <select class="form-select @error('account_id') is-invalid @enderror" name="account_id" id="account_id">
+                                    </div>
+                                    <div class="form-text text-muted small mt-1">Akun otomatis terpilih.</div>
+                                @else
+                                    <div class="input-group-soft">
+                                        <span class="input-group-text"><i class="fa-solid fa-wallet"></i></span>
+                                        <select class="form-control form-select border-0 shadow-none bg-transparent" name="account_id" style="cursor: pointer;">
                                             <option value="" disabled selected>-- Pilih Akun --</option>
                                             @foreach($accounts as $account)
                                                 <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>
@@ -133,41 +113,34 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                        @error('account_id')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                
-                                    @endif
-                                </div>
+                                    </div>
+                                    @error('account_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                @endif
                             </div>
+                        </div>
 
-                            <div class="mb-4">
-                                <label for="notes" class="form-label">Catatan (Opsional)</label>
-                                <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3" placeholder="Contoh: Makan siang di warteg">{{ old('notes') }}</textarea>
-                                @error('notes')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                        <div class="mb-5">
+                            <label class="form-label-custom">CATATAN (OPSIONAL)</label>
+                            <div class="input-group-soft align-items-start">
+                                <span class="input-group-text pt-3"><i class="fa-regular fa-note-sticky"></i></span>
+                                <textarea name="transaction_notes" class="form-control" rows="3" placeholder="Contoh: Makan siang di warteg">{{ old('transaction_notes') }}</textarea>
                             </div>
+                        </div>
 
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fa-solid fa-save"></i> Simpan Transaksi
-                                </button>
-                            </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary rounded-3 py-3 fw-bold shadow-sm">
+                                <i class="fa-solid fa-check me-2"></i> Simpan Transaksi
+                            </button>
+                            <a href="{{ route('transactions.index') }}" class="btn btn-danger rounded-3 py-3 text-muted fw-bold">
+                                Batal
+                            </a>
+                        </div>
 
-                        </form>
-                    </div>
+                    </form>
                 </div>
             </div>
+
         </div>
     </div>
-  </div>
 
-  <script>
-    function toggleDark() { document.body.classList.toggle('dark'); }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+@endsection

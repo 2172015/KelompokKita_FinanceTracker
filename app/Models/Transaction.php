@@ -9,9 +9,6 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    // Tabel transactions di script SQL Anda TIDAK memiliki created_at/updated_at
-    public $timestamps = false; 
-
     protected $fillable = [
         'amount',
         'type', // ENUM: 'income', 'expense'

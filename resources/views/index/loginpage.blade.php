@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Finance Tracker</title>
+  <title>Login - Finance Tracker</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -43,8 +43,21 @@
     
             <div class="mb-4">
                 <label for="password" class="form-label fw-bold" style="font-size: 13px; color: var(--muted);">PASSWORD</label>
+                
                 <div class="form-wrapper position-relative">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="••••••••" 
+                           required 
+                           style="padding-right: 45px;">
+                    
+                    <span class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted" 
+                          onclick="togglePassword()" 
+                          style="cursor: pointer; z-index: 10;">
+                        <i class="fa-solid fa-eye" id="toggleIcon"></i>
+                    </span>
                 </div>
             </div>
     
@@ -74,6 +87,28 @@
       </div>
     
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+      <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            // Cek tipe input saat ini
+            if (passwordInput.type === 'password') {
+                // Ubah jadi text (Show)
+                passwordInput.type = 'text';
+                // Ganti icon jadi mata dicoret
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                // Kembalikan jadi password (Hide)
+                passwordInput.type = 'password';
+                // Kembalikan icon jadi mata biasa
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+      </script>
 
 </body>
 </html>

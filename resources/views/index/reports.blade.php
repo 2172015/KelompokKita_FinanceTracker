@@ -1,140 +1,198 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Finance Reports</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="{{ asset('dist/css/style.css') }}">
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet">
+@extends('layouts.app')
 
-  <!-- Chart JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+@section('title', 'Financial Reports - Finance Tracker')
 
-<body>
-  <div class="layout-container">
+@section('content')
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>FINANCE</h2>
-
-    <a href="{{ route('dashboard') }}" 
-       class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
-        <i class="fa-solid fa-gauge"></i> Dashboard
-    </a>
-
-    <a href="{{ route('transactions') }}" 
-       class="{{ request()->routeIs('transactions') ? 'active' : '' }} normal">
-        <i class="fa-solid fa-wallet"></i> Transactions
-    </a>
-
-    <a href="{{ route('accounts') }}" 
-       class="{{ request()->routeIs('accounts') ? 'active' : '' }} normal">
-        <i class="fa-solid fa-building-columns"></i> Accounts
-    </a>
-
-    <a href="{{ route('budgets') }}" 
-       class="{{ request()->routeIs('budgets') ? 'active' : '' }} normal">
-        <i class="fa-solid fa-piggy-bank"></i> Budgets
-    </a>
-
-    <a href="{{ route('categories') }}" 
-       class="{{ request()->routeIs('categories') ? 'active' : '' }} normal">
-        <i class="fa-solid fa-tags"></i> Categories
-    </a>
-
-    <a href="{{ route('reports') }}" 
-       class="{{ request()->routeIs('reports') ? 'active' : '' }} normal">
-        <i class="fa-solid fa-chart-pie"></i> Reports
-    </a>
-
-    <a href="{{ route('profile.page') }}" 
-       class="{{ request()->routeIs('profile.page') ? 'active' : '' }} normal">
-        <i class="fa-solid fa-user"></i> Profile
-    </a>
-
-    <a href="none" class="btn btn-danger logout">
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" style="background:none; border:none; color:white">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </button>
-    </form>
-    </a>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main-content">
-
-    <!-- Header -->
-    <div class="header">
-      <h1>Reports & Analytics</h1>
-      <button class="toggle" onclick="toggleDark()"><i class="fa-solid fa-moon"></i></button>
+    <div class="header mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+        <div>
+            <h1 class="mb-1">Financial Reports</h1>
+            <p class="text-muted m-0 small">Analisis arus kas dalam periode tertentu.</p>
+        </div>
+        
+        <form action="{{ route('reports.index') }}" method="GET">
+            <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-4 shadow-sm border">
+                
+                <div class="custom-date" title="Dari Bulan">
+                    <i class="fa-solid fa-calendar text-muted"></i>
+                    <input type="month" name="from_date" value="{{ $fromDateVal }}">
+                </div>
+    
+                <span class="text-muted small"><i class="fa-solid fa-arrow-right"></i></span>
+    
+                <div class="custom-date" title="Sampai Bulan">
+                    <i class="fa-solid fa-calendar-check text-muted"></i>
+                    <input type="month" name="to_date" value="{{ $toDateVal }}">
+                </div>
+    
+                <button type="submit" class="btn btn-primary rounded-3 px-3 py-2 shadow-sm d-flex align-items-center justify-content-center" style="height: 38px;">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
+            </div>
+        </form>
     </div>
 
-    <!-- Chart Section -->
-    <div class="cards">
+    <div class="row g-3 mb-4">
+        
+        <div class="col-md-4">
+            <div class="stat-card income shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="mb-1 fw-bold opacity-75 small">TOTAL INCOME</p>
+                        <h3 class="fw-bold mb-0">Rp {{ number_format($totalIncome, 0, ',', '.') }}</h3>
+                    </div>
+                    <div class="icon-bg">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-4">
+            <div class="stat-card expense shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="mb-1 fw-bold opacity-75 small">TOTAL EXPENSE</p>
+                        <h3 class="fw-bold mb-0">Rp {{ number_format($totalExpense, 0, ',', '.') }}</h3>
+                    </div>
+                    <div class="icon-bg">
+                        <i class="fa-solid fa-arrow-trend-down"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-4">
+            <div class="stat-card balance shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="mb-1 fw-bold opacity-75 small">NET BALANCE</p>
+                        <h3 class="fw-bold mb-0">Rp {{ number_format($netIncome, 0, ',', '.') }}</h3>
+                    </div>
+                    <div class="icon-bg">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      <!-- Income vs Expense -->
-      <div class="card">
-        <h3>Income vs Expense</h3>
-        <canvas id="incomeExpenseChart"></canvas>
-      </div>
+    <div class="row g-4">
+        
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4">Arus Kas (Cash Flow)</h5>
+                    <div style="height: 300px; width: 100%;">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-      <!-- Category Breakdown -->
-      <div class="card">
-        <h3>Category Breakdown</h3>
-        <canvas id="categoryChart"></canvas>
-      </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4">Pengeluaran per Kategori</h5>
+                    <div style="height: 300px; position: relative;">
+                        @if(count($pieData) > 0)
+                            <canvas id="categoryChart"></canvas>
+                        @else
+                            <div class="d-flex align-items-center justify-content-center h-100 text-muted flex-column">
+                                <i class="fa-solid fa-chart-pie fa-2x mb-2 opacity-25"></i>
+                                <small>Tidak ada pengeluaran</small>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
-  </div>
-</div>
+@endsection
 
+@push('scripts')
 <script>
-  function toggleDark() {
-    document.body.classList.toggle("dark");
-  }
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // 1. DATA DARI CONTROLLER
+        const barLabels = {!! json_encode($barLabels ?? []) !!};
+        const incomeData = {!! json_encode($incomeData ?? []) !!};
+        const expenseData = {!! json_encode($expenseData ?? []) !!};
+        const pieLabels = {!! json_encode($pieLabels ?? []) !!};
+        const pieData = {!! json_encode($pieData ?? []) !!};
 
-  /* 📊 Chart 1 - Income vs Expense Trend */
-  const incomeExpenseChart = new Chart(document.getElementById("incomeExpenseChart"), {
-    type: "line",
-    data: {
-      labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-      datasets: [
-        {
-          label: "Income",
-          data: [3500,4000,4200,5000,4700,5300,5500,5200,6000,5800,6100,6500],
-          borderWidth: 2
-        },
-        {
-          label: "Expense",
-          data: [2000,2200,2400,2600,2500,3000,3150,2980,3300,3500,3600,3900],
-          borderWidth: 2
+        // 2. BAR CHART (CASH FLOW)
+        const canvasBar = document.getElementById('cashFlowChart');
+        if (canvasBar) {
+            new Chart(canvasBar.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: barLabels,
+                    datasets: [
+                        {
+                            label: 'Pemasukan',
+                            data: incomeData,
+                            backgroundColor: '#10b981',
+                            borderRadius: 4,
+                            barPercentage: 0.6,
+                        },
+                        {
+                            label: 'Pengeluaran',
+                            data: expenseData,
+                            backgroundColor: '#ef4444',
+                            borderRadius: 4,
+                            barPercentage: 0.6,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 4], color: '#e5e7eb' } 
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
         }
-      ],
-    },
-    options:{ responsive:true }
-  });
 
-  /* 📊 Chart 2 - Expense Category Breakdown */
-  const categoryChart = new Chart(document.getElementById("categoryChart"), {
-    type: "pie",
-    data: {
-      labels: ["Food","Bills","Transport","Entertainment","Shopping","Others"],
-      datasets: [{
-        data: [450,300,200,120,500,180]
-      }]
-    },
-    options: { responsive:true }
-  });
-
+        // 3. PIE CHART (CATEGORIES)
+        const canvasPie = document.getElementById('categoryChart');
+        if (canvasPie && pieData.length > 0) {
+            new Chart(canvasPie.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: [
+                            '#4f46e5', '#ec4899', '#f59e0b', '#10b981', '#6366f1', '#8b5cf6', '#06b6d4', '#f43f5e'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { usePointStyle: true, boxWidth: 8 } 
+                        }
+                    }
+                }
+            });
+        }
+    });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endpush

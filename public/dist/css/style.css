@@ -144,6 +144,19 @@ body {
   transform: translateY(-2px);
 }
 
+/* Memaksa tombol danger agar tetap merah */
+.btn.btn-danger {
+  background-color: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: white !important;
+}
+
+/* Efek hover untuk tombol danger */
+.btn.btn-danger:hover {
+  background-color: #dc2626 !important; /* Merah yang lebih gelap */
+  transform: translateY(-2px);
+}
+
 .toggle {
   background: var(--card);
   border: none;
@@ -196,6 +209,50 @@ body {
   top: -40px;
 }
 
+/* ===== CARD ACTIONS (Tombol Edit & Delete di Pojok) ===== */
+
+/* Wrapper untuk posisi di pojok kanan atas */
+.card-actions {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10; /* Pastikan di atas link kartu */
+  display: flex;
+  gap: 8px;
+}
+
+/* Style dasar tombol bulat */
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%; /* Bulat sempurna */
+  background: white;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  
+  /* Trik agar icon pas di tengah */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Reset padding bawaan .btn */
+  
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Warna spesifik */
+.btn-action.edit { color: var(--primary); }
+.btn-action.delete { color: var(--danger); }
+
+/* Efek Hover */
+.btn-action:hover {
+  transform: scale(1.1); /* Membesar sedikit saat hover */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-action.edit:hover { background-color: var(--primary); color: white; }
+.btn-action.delete:hover { background-color: var(--danger); color: white; }
+
 /* ===== TABLE ===== */
 .table-wrapper {
   background: var(--card);
@@ -230,14 +287,281 @@ td {
 .income { color: var(--success); font-weight: 600; }
 .expense { color: var(--danger); font-weight: 600; }
 
+/* ===== FILTER BAR (Khusus untuk Date Picker) ===== */
+.filter-bar {
+  background: var(--card);
+  padding: 8px 10px 8px 20px; /* Padding kiri lebih besar untuk teks */
+  border-radius: 50px; /* Membuat bentuk lonjong (Pill) */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  width: fit-content; /* Agar lebar menyesuaikan isi, tidak full */
+}
+
+/* Input tanggal yang transparan dan bersih */
+.filter-input {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  max-width: 130px;
+}
+
+/* Memperbaiki tampilan Header agar responsif */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* Judul di bawah, Filter di bawah */
+  margin-bottom: 30px;
+  flex-wrap: wrap; /* Agar turun ke bawah di HP */
+  gap: 20px;
+}
+
+/* Tombol Filter Bulat */
+.btn-filter {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  border: none;
+  transition: 0.3s;
+}
+
+.btn-filter:hover {
+  background: var(--secondary);
+  transform: rotate(15deg);
+}
+
+/* Divider Panah */
+.filter-separator {
+  color: var(--muted);
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* ===== 1. CUSTOM DATE PICKER ===== */
+/* Container input tanggal agar terlihat seperti tombol */
+.custom-date {
+  position: relative;
+  background: #f8fafc; /* Abu sangat muda */
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
+  min-width: 140px;
+}
+
+.custom-date:hover, .custom-date:focus-within {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Input aslinya dibuat transparan */
+.custom-date input[type="month"] {
+  border: none;
+  background: transparent;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Icon kalender */
+.custom-date i {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ===== 2. COLORED SUMMARY CARDS ===== */
+.stat-card {
+  border: none;
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-card:hover { transform: translateY(-5px); }
+
+/* Varian INCOME (Hijau Lembut) */
+.stat-card.income {
+  background: #ecfdf5; /* Hijau muda sekali */
+  color: #065f46;
+}
+.stat-card.income .icon-bg {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+/* Varian EXPENSE (Merah Lembut) */
+.stat-card.expense {
+  background: #fef2f2; /* Merah muda sekali */
+  color: #991b1b;
+}
+.stat-card.expense .icon-bg {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* Varian BALANCE (Biru Lembut) */
+.stat-card.balance {
+  background: #eef2ff; /* Biru muda sekali */
+  color: #3730a3;
+}
+.stat-card.balance .icon-bg {
+  background: rgba(79, 70, 229, 0.2);
+  color: #4f46e5;
+}
+
+/* Icon Bulat di dalam card */
+.icon-bg {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+/* ===== FORM STYLING (Soft UI) ===== */
+/* Label Form yang lebih rapi */
+.form-label-custom {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Wrapper Input Group yang lembut */
+.input-group-soft {
+  background-color: #f8fafc; /* Abu sangat muda */
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  transition: 0.3s;
+  padding: 2px 5px;
+}
+
+/* Efek Fokus */
+.input-group-soft:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  background-color: #ffffff;
+}
+
+/* Bagian "Rp" atau Icon di kiri */
+.input-group-soft .input-group-text {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-weight: 600;
+  padding-left: 15px;
+  padding-right: 5px;
+  font-size: 14px;
+}
+
+/* Input Field Asli */
+.input-group-soft .form-control {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 10px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.input-group-soft .form-control::placeholder {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+/* ===== HIDE NUMBER INPUT ARROWS (SPIN BUTTONS) ===== */
+
+/* Untuk Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Untuk Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
+  /* Tablet: Sidebar mengecil sedikit */
   .sidebar { width: 220px; }
   .main-content { padding: 20px; }
 }
 
 @media (max-width: 600px) {
-  .container { flex-direction: column; }
-  .sidebar { width: 100%; flex-direction: row; overflow-x: auto; }
-  .sidebar a { white-space: nowrap; }
+  /* Mobile: Ubah Layout dari Kiri-Kanan menjadi Atas-Bawah */
+  .layout-container { 
+      flex-direction: column; /* PENTING: Ganti .container jadi .layout-container */
+  }
+
+  .sidebar { 
+      width: 100%; 
+      height: auto; /* Reset tinggi agar tidak memenuhi layar */
+      flex-direction: row; /* Menu berjejer ke samping */
+      overflow-x: auto; /* Scroll samping jika menu banyak */
+      padding: 15px; /* Kurangi padding biar hemat tempat */
+      flex-shrink: 0; /* Agar sidebar tidak gepeng */
+  }
+
+  .sidebar h2 {
+      display: none; /* Sembunyikan Judul FINANCE di HP biar muat */
+  }
+
+  /* Logout wrapper disesuaikan di mobile */
+  .logout-wrapper {
+      margin-top: 0;
+      margin-left: auto; /* Geser tombol logout ke paling kanan */
+      min-width: 100px;
+  }
+  
+  .sidebar a { 
+      white-space: nowrap; 
+      font-size: 12px; /* Perkecil font di HP */
+      padding: 8px 12px;
+      flex-direction: column; /* Icon di atas teks */
+      gap: 5px;
+      text-align: center;
+  }
+
+  /* Matikan scrollbar jelek di sidebar mobile */
+  .sidebar::-webkit-scrollbar { height: 0px; background: transparent; }
 }
