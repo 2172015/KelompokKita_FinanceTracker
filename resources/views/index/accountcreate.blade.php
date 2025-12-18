@@ -1,103 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Finance Tracker</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  
-  <link rel="stylesheet" href="{{ asset('dist/css/style.css') }}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@extends('layouts.app')
 
-<body>
-    <div class="layout-container">
-        
-        <div class="sidebar">
-            <h2>FINANCE</h2>
-        
-            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }} normal">
-                <i class="fa-solid fa-gauge"></i> Dashboard
-            </a>
-        
-            <a href="{{ route('transactions.index') }}" class="{{ request()->routeIs('transactions*') ? 'active' : '' }} normal">
-                <i class="fa-solid fa-wallet"></i> Transactions
-            </a>
-          
-            <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories*') ? 'active' : '' }} normal">
-              <i class="fa-solid fa-tags"></i> Categories
-            </a>
-            <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('categories*') ? 'active' : '' }} normal">
-                <i class="fa-solid fa-chart-pie"></i> Reports
-            </a>
-            <a href="#" class="normal"><i class="fa-solid fa-user"></i> Profile</a>
-        
-            <div class="logout-wrapper" style="margin-top: auto;">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-danger w-100 text-start">
-                        <i class="fa-solid fa-right-from-bracket"></i> Logout
-                    </button>
-                </form>
-            </div>
+@section('title', 'Create Account - Finance Tracker')
+
+@section('content')
+
+    <div class="dashboard-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Tambah Dompet</h2>
+            <p class="text-muted m-0">Tambahkan akun bank, e-wallet, atau uang tunai baru.</p>
         </div>
-    
-        <div class="main-content">
-            <div class="header">
-                <h1>Create Account</h1>
-                <div class="header-actions">
-                <div class="me-3">Halo, <strong>{{ Auth::user()->name }}</strong></div>
-                    <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">
-                        <i class="fa-solid fa-arrow-left"></i> Kembali
-                    </a>
-                </div>
-            </div>
-
-            <div class="container mt-4">
-                <div class="card border-0 shadow-sm" style="border-radius: 15px; max-width: 600px;">
-                    <div class="card-body p-4">
-                        <h4 class="card-title mb-4">Informasi Dompet</h4>
-                        
-                        <form action="{{ route('accounts.store') }}" method="POST">
-                            @csrf <div class="mb-4">
-                                <label for="name" class="form-label fw-bold">Nama Akun / Dompet</label>
-                                <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="Contoh: BCA, Tunai, Gopay" required>
-                                @error('name')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-        
-                            <div class="mb-4">
-                                <label for="balance" class="form-label fw-bold">Saldo Awal</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white">Rp</span>
-                                    <input type="number" class="form-control form-control-lg" id="balance" name="balance" placeholder="0" min="0" required>
-                                </div>
-                                <small class="text-muted">Masukkan jumlah uang yang ada di dompet ini sekarang.</small>
-                                @error('balance')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-        
-                            <div class="d-flex justify-content-end gap-2 mt-5">
-                                <a href="{{ route('dashboard') }}" class="btn btn-light px-4">Batal</a>
-                                <button type="submit" class="btn btn-primary px-4">Simpan Akun</button>
-                            </div>
-        
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary rounded-pill shadow-sm px-4">
+                <i class="fa-solid fa-arrow-left me-2"></i> Kembali ke Dashboard
+            </a>
         </div>
     </div>
 
-  <script>
-    function toggleDark() { document.body.classList.toggle('dark'); }
-  </script>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-5"> 
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="text-center mb-5">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-theme-soft text-theme mb-3" style="width: 80px; height: 80px;">
+                            <i class="fa-solid fa-wallet fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1 text-dark">Setup Dompet</h4>
+                        <p class="text-muted small">Masukkan detail saldo awal Anda.</p>
+                    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                    <form action="{{ route('accounts.store') }}" method="POST">
+                        @csrf 
 
-</body>
-</html>
+                        <div class="mb-4">
+                            <label for="name" class="form-label text-uppercase small fw-bold text-muted ps-1">
+                                Nama Akun / Dompet
+                            </label>
+                            
+                            <div class="input-group-soft @error('name') border-danger @enderror">
+                                <span class="input-group-text">
+                                    <i class="fa-solid fa-signature text-muted"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="name" 
+                                       name="name" 
+                                       placeholder="Contoh: BCA, Gopay, Tunai"
+                                       value="{{ old('name') }}" 
+                                       required
+                                       autofocus>
+                            </div>
+                            
+                            @error('name')
+                                <div class="text-danger small mt-1 ps-1">
+                                    <i class="fa-solid fa-circle-exclamation me-1"></i> {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="balance" class="form-label text-uppercase small fw-bold text-muted ps-1">
+                                Saldo Awal
+                            </label>
+                            
+                            <div class="input-group-soft @error('balance') border-danger @enderror">
+                                <span class="input-group-text fw-bold text-muted" style="font-size: 0.9rem;">
+                                    Rp
+                                </span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="balance" 
+                                       name="balance" 
+                                       placeholder="0" 
+                                       min="0"
+                                       value="{{ old('balance') }}" 
+                                       required>
+                            </div>
+                            
+                            @error('balance')
+                                <div class="text-danger small mt-1 ps-1">
+                                    <i class="fa-solid fa-circle-exclamation me-1"></i> {{ $message }}
+                                </div>
+                            @enderror
+                            
+                            <div class="form-text text-muted small mt-2 ps-1">
+                                * Masukkan jumlah uang yang ada di dompet ini sekarang.
+                            </div>
+                        </div>
+      
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary py-3 fw-bold shadow-sm">
+                                <i class="fa-solid fa-check me-2"></i> Simpan Akun
+                            </button>
+                        </div>
+      
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+@endsection

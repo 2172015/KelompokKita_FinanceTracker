@@ -32,68 +32,99 @@ class TransactionController extends Controller
         // Kirim juga parameter agar view tahu kita sedang memfilter akun apa (opsional)
         // append() pada pagination berguna agar saat pindah page 2, filternya tidak hilang
         $transactions->appends($request->all());
+        $accountsCount = Account::where('user_id', Auth::id())->count();
 
-        return view('index/transactions/transactions', compact('transactions'));
+        return view('index/transactions/transactions', compact('transactions', 'accountsCount'));
     }
 
     // Halaman Form Create
     public function create(Request $request)
     {
-        // 1. Ambil account_id dari URL (jika ada)
+        // 1. Ambil semua akun milik user
+        $accounts = Account::where('user_id', Auth::id())->get();
+
+        // 2. VALIDASI: Jika tidak ada akun, tendang ke halaman buat akun
+        if ($accounts->isEmpty()) {
+            return redirect()
+                ->route('accountcreate') // Pastikan nama route ini sesuai (lihat routes/web.php)
+                ->with('error', 'Anda harus membuat Dompet/Akun terlebih dahulu sebelum mencatat transaksi.');
+        }
+
+        // 3. Lanjut proses normal...
+        $categories = Category::where('user_id', Auth::id())->get();
+        
+        // Ambil account_id dari URL jika ada
         $accountId = $request->query('account_id');
         $selectedAccount = null;
 
-        // 2. Jika ada ID, cari datanya untuk ditampilkan namanya nanti
         if ($accountId) {
-            $selectedAccount = Account::where('user_id', Auth::id())
-                                    ->where('id', $accountId)
-                                    ->first();
+            $selectedAccount = $accounts->where('id', $accountId)->first();
         }
-
-        // 3. Tetap ambil semua akun (untuk berjaga-jaga jika user masuk lewat sidebar)
-        $accounts = Account::where('user_id', Auth::id())->get();
-        $categories = Category::where('user_id', Auth::id())->get();
 
         return view('index/transactions/transactioncreate', compact('accounts', 'categories', 'selectedAccount'));
     }
 
-    // Simpan Data (Store)
+    /**
+     * Simpan Transaksi Baru
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'account_id' => 'required|exists:accounts,id',
-            'category_id' => 'required|exists:categories,id',
-            'amount' => 'required|numeric|min:1',
-            'type' => 'required|in:income,expense',
-            'date' => 'required|date',
-            'notes' => 'nullable|string|max:255',
+            'account_id'    => 'required|exists:accounts,id',
+            'category_id'   => 'required|exists:categories,id',
+            'amount'        => 'required|numeric|min:1',
+            'date'          => 'required|date',
+            'description'   => 'nullable|string|max:255',
+            'type'          => 'required|in:income,expense',
         ]);
 
-        DB::transaction(function () use ($request) {
+        $account = Account::findOrFail($request->account_id);
+
+        if ($account->user_id != Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Cek Saldo Dompet (Hanya jika pengeluaran)
+        if ($request->type == 'expense') {
+            if ($request->amount > $account->balance) {
+                return back()
+                    ->withErrors(['amount' => 'Saldo tidak mencukupi! Sisa: ' . number_format($account->balance)])
+                    ->withInput();
+            }
+        }
+
+        DB::transaction(function () use ($request, $account) {
+            
             // 1. Simpan Transaksi
             Transaction::create([
-                'account_id' => $request->account_id,
+                'account_id'  => $request->account_id,
                 'category_id' => $request->category_id,
-                'amount' => $request->amount,
-                'type' => $request->type,
-                'date' => $request->date,
-                'transaction_notes' => $request->notes,
+                'amount'      => $request->amount,
+                'date'        => $request->date,
+                'description' => $request->description,
+                'type'        => $request->type,
             ]);
 
-            // 2. Update Saldo Akun
-            $account = Account::find($request->account_id);
+            // 2. Update Saldo AKUN (Dompet)
             if ($request->type == 'income') {
                 $account->increment('balance', $request->amount);
             } else {
                 $account->decrement('balance', $request->amount);
             }
 
-            // 3. Update Saldo Kategori
-            $category = Category::find($request->category_id);
-            $category->increment('categories_balance', $request->amount);
+            // 3. Update Saldo KATEGORI (PENTING!)
+            // Kita hanya menambah saldo kategori jika ini adalah PENGELUARAN (Expense)
+            // Atau sesuaikan dengan logika bisnis Anda. Biasanya budget kategori = total pengeluaran.
+            if ($request->type == 'expense') {
+                $category = Category::find($request->category_id);
+                if ($category) {
+                    $category->increment('categories_balance', $request->amount);
+                }
+            }
+            
         });
 
-        return redirect()->route('dashboard')->with('success', 'Transaksi berhasil disimpan!');
+        return redirect()->route('dashboard')->with('success', 'Transaksi berhasil disimpan.');
     }
 
     public function listByAccount($id)
@@ -115,42 +146,86 @@ class TransactionController extends Controller
         return view('index/transactions/transactionslist', compact('account', 'transactions'));
     }
 
-    // Hapus Transaksi (Destroy)
+    /**
+     * Hapus Satu Transaksi
+     */
     public function destroy($id)
     {
-        // 1. Cari Transaksi berdasarkan ID
         $transaction = Transaction::findOrFail($id);
 
-        // 2. Keamanan: Cek apakah transaksi ini milik akun user yang sedang login
-        // Kita load relasi account untuk cek user_id
         if ($transaction->account->user_id != Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
         DB::transaction(function () use ($transaction) {
-            // 3. Ambil Akun dan Kategori terkait
             $account = $transaction->account;
             $category = $transaction->category;
 
-            // 4. LOGIKA PENGEMBALIAN SALDO (Rollback)
+            // 1. Rollback Saldo AKUN
             if ($transaction->type == 'income') {
-                // Jika dulu Pemasukan (uang masuk), maka saat dihapus uang harus DITARIK KEMBALI (dikurangi)
                 $account->decrement('balance', $transaction->amount);
             } else {
-                // Jika dulu Pengeluaran (uang keluar), maka saat dihapus uang harus DIKEMBALIKAN (ditambah)
                 $account->increment('balance', $transaction->amount);
             }
 
-            // 5. Kembalikan saldo kategori (Opsional, agar data sinkron dengan method store)
-            if ($category) {
+            // 2. Rollback Saldo KATEGORI (INI YANG ANDA CARI)
+            // Jika transaksi yang dihapus adalah pengeluaran, kurangi total pengeluaran kategori
+            if ($transaction->type == 'expense' && $category) {
                 $category->decrement('categories_balance', $transaction->amount);
             }
 
-            // 6. Hapus Data Transaksi Permanen
+            // 3. Hapus Data
             $transaction->delete();
         });
 
-        // Redirect kembali ke halaman sebelumnya (bisa dari index atau listByAccount)
-        return back()->with('success', 'Transaksi berhasil dihapus dan saldo telah dikembalikan.');
+        return back()->with('success', 'Transaksi dihapus & saldo dikembalikan.');
+    }
+
+    /**
+     * Hapus Banyak Transaksi Sekaligus
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|string',
+        ]);
+
+        $ids = explode(',', $request->ids);
+
+        // Ambil data transaksi yang akan dihapus (untuk loop logic saldo)
+        $transactions = Transaction::whereIn('id', $ids)
+            ->whereHas('account', function($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->with(['account', 'category']) // Eager load biar cepat
+            ->get();
+
+        if ($transactions->isEmpty()) {
+            return back()->with('error', 'Tidak ada data yang dihapus.');
+        }
+
+        DB::transaction(function () use ($transactions) {
+            foreach ($transactions as $transaction) {
+                $account = $transaction->account;
+                $category = $transaction->category;
+
+                // 1. Rollback Saldo AKUN
+                if ($transaction->type == 'income') {
+                    $account->decrement('balance', $transaction->amount);
+                } else {
+                    $account->increment('balance', $transaction->amount);
+                }
+
+                // 2. Rollback Saldo KATEGORI
+                if ($transaction->type == 'expense' && $category) {
+                    $category->decrement('categories_balance', $transaction->amount);
+                }
+
+                // 3. Hapus Item
+                $transaction->delete();
+            }
+        });
+
+        return back()->with('success', count($transactions) . ' transaksi berhasil dihapus.');
     }
 }

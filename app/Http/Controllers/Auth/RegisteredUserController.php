@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -40,6 +41,28 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Daftar kategori umum yang ingin Anda berikan
+        $defaults = [
+            'Gaji',           // Pemasukan
+            'Makanan',        // Pengeluaran
+            'Transportasi',   // Pengeluaran
+            'Tempat Tinggal', // Pengeluaran (Kos/Listrik/Air)
+            'Belanja',        // Pengeluaran
+            'Hiburan',        // Pengeluaran
+            'Kesehatan',      // Pengeluaran
+            'Pendidikan',     // Pengeluaran
+            'Lain-lain'       // Umum
+        ];
+
+        // Loop dan simpan ke database milik user tersebut
+        foreach ($defaults as $catName) {
+            Category::create([
+                'user_id' => $user->id, // PENTING: Link ke user baru
+                'name' => $catName,
+                'categories_balance' => 0,
+            ]);
+        }
 
         event(new Registered($user));
 

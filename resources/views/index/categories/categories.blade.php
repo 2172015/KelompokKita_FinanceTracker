@@ -4,81 +4,87 @@
 
 @section('content')
 
-    <div class="header mb-4">
+    <div class="dashboard-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
         <div>
-            <h1 class="mb-1">Categories List</h1>
-            <p class="text-muted m-0 small">Kelola kategori pengeluaran dan pemasukan Anda.</p>
+            <h2 class="fw-bold text-dark mb-1">Daftar Kategori</h2>
+            <p class="text-muted m-0">Kelola jenis pemasukan dan pengeluaran.</p>
         </div>
-        <div class="header-actions">
-            <div class="me-3">Halo, <strong>{{ Auth::user()->name }}</strong></div>
+        <div>
+            <a href="{{ route('categories.create') }}" class="btn btn-primary rounded-pill shadow-sm text-white px-4">
+                <i class="fa-solid fa-plus me-2"></i> Kategori Baru
+            </a>
         </div>
     </div>
 
-    <div class="d-flex justify-content-end mb-4">
-        <a href="{{ route('categories.create') }}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
-            <i class="fa-solid fa-plus me-2"></i> Add New Category
-        </a>
-    </div>
+    @if(session('success'))
+        <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3 d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-check me-2 fs-5"></i>
+            <div>{{ session('success') }}</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-    <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+    <div class="table-wrapper p-0 p-md-4 overflow-hidden">
+        <div class="p-4 p-md-0 d-flex justify-content-between align-items-center mb-md-3">
+            <h3 class="fw-bold text-dark mb-0 fs-5">List Kategori</h3>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4 py-3 text-secondary text-uppercase" style="font-size: 11px; font-weight: 700; width: 5%;">No</th>
-                        <th class="py-3 text-secondary text-uppercase" style="font-size: 11px; font-weight: 700;">Category Name</th>
-                        <th class="py-3 text-secondary text-uppercase text-end pe-5" style="font-size: 11px; font-weight: 700;">Total Balance</th>
-                        <th class="py-3 text-secondary text-uppercase text-center" style="font-size: 11px; font-weight: 700; width: 15%;">Actions</th>
+                        <th class="ps-4 py-3 text-secondary text-uppercase small d-none d-md-table-cell" style="width: 5%;">No</th>
+                        <th class="ps-4 ps-md-0 py-3 text-secondary text-uppercase small">Nama Kategori</th>
+                        <th class="py-3 text-secondary text-uppercase text-end pe-4 small">Total Pengeluaran</th>
+                        <th class="py-3 text-secondary text-uppercase text-center small" style="width: 50px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($categories as $category)
-                    <tr>
-                        <td class="ps-4 text-muted fw-bold">{{ $loop->iteration }}</td>
+                    <tr class="table-row-hover">
+                        <td class="ps-4 text-muted fw-bold d-none d-md-table-cell">{{ $loop->iteration }}</td>
                         
-                        <td>
+                        <td class="ps-4 ps-md-0">
                             <div class="d-flex align-items-center">
-                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary me-3" style="width: 35px; height: 35px;">
-                                    <i class="fa-solid fa-tag"></i>
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-theme-soft text-theme me-3" style="width: 35px; height: 35px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-tag" style="font-size: 0.9rem;"></i>
                                 </div>
-                                <span class="fw-bold text-dark">{{ $category->name }}</span>
+                                <div>
+                                    <div class="fw-semibold text-dark">{{ $category->name }}</div>
+                                </div>
                             </div>
                         </td>
 
-                        <td class="text-end pe-5">
-                            <span class="fw-bold {{ $category->categories_balance < 0 ? 'text-danger' : 'text-dark' }}">
+                        <td class="text-end pe-4 text-nowrap">
+                            <span class="fw-bold {{ $category->categories_balance < 0 ? 'text-danger' : 'text-dark' }}" style="font-size: 0.9rem;">
                                 Rp {{ number_format($category->categories_balance ?? 0, 0, ',', '.') }}
                             </span>
                         </td>
 
                         <td class="text-center">
-                            <div class="d-flex justify-content-center">
-                                
-                                @if($category->categories_balance == 0)
-                                    <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kategori {{ $category->name }}?');">
-                                        @csrf 
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;" title="Delete">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </form>
-                                @else
-                                    <button type="button" class="btn btn-sm btn-outline-secondary border-0 rounded-circle opacity-50" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: not-allowed;" disabled title="Tidak bisa dihapus karena saldo belum Rp 0">
-                                        <i class="fa-solid fa-trash"></i>
+                            @if($category->categories_balance == 0)
+                                <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kategori {{ $category->name }}?');">
+                                    @csrf 
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-action-circle delete" title="Hapus">
+                                        <i class="fa-solid fa-trash" style="font-size: 0.8rem;"></i>
                                     </button>
-                                @endif
-                                
-                            </div>
+                                </form>
+                            @else
+                                <button type="button" class="btn-action-circle opacity-50" style="cursor: not-allowed;" disabled title="Saldo harus Rp 0 untuk menghapus">
+                                    <i class="fa-solid fa-trash text-muted" style="font-size: 0.8rem;"></i>
+                                </button>
+                            @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center py-5">
-                            <div class="mb-3 text-muted opacity-25">
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <div class="mb-3 opacity-25">
                                 <i class="fa-solid fa-folder-open fa-3x"></i>
                             </div>
-                            <h5 class="text-muted fw-bold">Belum ada kategori.</h5>
-                            <p class="text-muted small">Silakan tambahkan kategori baru untuk memulai.</p>
+                            <h6 class="text-muted fw-bold">Belum ada kategori.</h6>
+                            <p class="small m-0">Silakan tambahkan kategori baru.</p>
                         </td>
                     </tr>
                     @endforelse
