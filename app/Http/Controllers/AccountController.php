@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\Budget;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,14 +16,12 @@ class AccountController extends Controller
      */
     public function index()
     {
-        // Fitur ini akan menampilkan daftar akun (opsional untuk nanti)
         $accounts = Account::where('user_id', Auth::id())->get();
-        return view('dashboard', compact('accounts')); // Sementara redirect ke dashboard
+        return view('dashboard', compact('accounts'));
     }
 
     public function create()
     {
-        // Return view form yang akan kita buat
         return view('index/accountcreate');
     }
 
@@ -34,22 +33,18 @@ class AccountController extends Controller
         $request->validate([
             'name' => 'required|string|max:50',
             'balance' => 'required|numeric|min:0',
-            // Validasi lain...
         ]);
     
-        // 1. Simpan Akun
         $account = Account::create([
             'user_id' => Auth::id(),
             'name' => $request->name,
             'balance' => $request->balance,
-            // field lain...
         ]);
     
-        // 2. OTOMATIS: Buat Budget Default (0 Rupiah dulu, nanti diedit user)
         Budget::create([
             'account_id' => $account->id,
             'name' => 'Budget ' . $account->name,
-            'maximum_expense' => 0, // Default 0
+            'maximum_expense' => 0,
             'target_balance' => 0,
             'minimum_balance' => 0,
             'starting_balance' => 0,
@@ -60,29 +55,47 @@ class AccountController extends Controller
     }
 
     /**
-     * Menghapus Akun
+     * Menghapus Akun & Sinkronisasi Saldo Kategori
      */
     public function destroy($id)
     {
-        // 1. Cari Akun
         $account = Account::findOrFail($id);
     
-        // 2. Cek Keamanan (Pastikan milik user yang login)
+        // Cek Keamanan
         if ($account->user_id != Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
     
-        // 3. Gunakan DB Transaction agar aman
         DB::transaction(function () use ($account) {
             
-            // LANGKAH PENTING: Hapus semua transaksi milik akun ini terlebih dahulu
-            // Pastikan di Model Account ada relasi public function transactions()
+            // ============================================================
+            // 1. UPDATE SALDO KATEGORI (Logic Baru)
+            // ============================================================
+            // Sebelum dihapus, kita ambil dulu semua transaksi pengeluaran (expense)
+            // dari akun ini agar kita bisa kurangi saldo di kategori terkait.
+            $expenses = $account->transactions()
+                                ->where('type', 'expense')
+                                ->get();
+
+            foreach ($expenses as $expense) {
+                // Jika transaksi punya kategori, kurangi saldo kategorinya
+                if ($expense->category_id) {
+                    Category::where('id', $expense->category_id)
+                        ->decrement('categories_balance', $expense->amount);
+                }
+            }
+            // ============================================================
+
+            // 2. Hapus semua transaksi milik akun ini
             $account->transactions()->delete();
     
-            // Setelah bersih, baru hapus akunnya
+            // 3. Hapus Budget yang terhubung
+            Budget::where('account_id', $account->id)->delete();
+    
+            // 4. Hapus Akun
             $account->delete();
         });
     
-        return back()->with('success', 'Akun dompet dan seluruh riwayat transaksinya berhasil dihapus.');
-    }
+        return back()->with('success', 'Akun berhasil dihapus. Saldo kategori terkait telah disesuaikan.');
+    }    
 }
