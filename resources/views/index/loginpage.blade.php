@@ -1,18 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Finance Tracker</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  
-  <link rel="stylesheet" href="{{ asset('dist/css/login.css') }}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@extends('layouts.guest')
 
-<body>
+@section('title', 'Login - Finance Tracker')
+
+@section('content')
     <div class="card login-card border-0">
     
         <div class="login-header">
@@ -84,31 +74,24 @@
                 <a href="{{ route('register') }}" class="link-register">Daftar disini</a>
             </div>
         </form>
-      </div>
-    
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+@endsection
 
-      <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
+@push('scripts')
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggleIcon');
 
-            // Cek tipe input saat ini
-            if (passwordInput.type === 'password') {
-                // Ubah jadi text (Show)
-                passwordInput.type = 'text';
-                // Ganti icon jadi mata dicoret
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                // Kembalikan jadi password (Hide)
-                passwordInput.type = 'password';
-                // Kembalikan icon jadi mata biasa
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
         }
-      </script>
-
-</body>
-</html>
+    }
+</script>
+@endpush

@@ -65,23 +65,17 @@ Route::prefix('')->middleware(['auth', 'verified'])->group(function () {
 
     // 2. ACCOUNT ROUTES: Untuk menampilkan form dan menyimpan data
     Route::get('/accountcreate', [AccountController::class, 'create'])->name('accountcreate');
-    // Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
-    Route::resource('accounts', AccountController::class);
-
-    // Route::view('/budgets', 'index.budgets')->name('budgets');
-    Route::resource('budgets', BudgetController::class);
-    Route::view('/accounts', 'index.accounts')->name('accounts');
-    // Route::view('/categories', 'index.categories')->name('categories');
-    Route::resource('categories', CategoryController::class);
-    Route::view('/profile-page', 'index.profile')->name('profile.page');
-    // Route::view('/reports', 'index.reports')->name('reports');
-    // Route::get('/transactions', 'index.transactions')->name('transactions');
-    Route::resource('transactions', TransactionController::class);
-
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/accounts/{id}/transactions', [TransactionController::class, 'listByAccount'])
     ->name('transactions.list');
+    Route::view('/accounts', 'index.accounts')->name('accounts');
+    Route::delete('/transactions/bulk-delete', [TransactionController::class, 'bulkDestroy'])->name('transactions.bulkDestroy');
+    Route::resource('accounts', AccountController::class);
+    Route::resource('budgets', BudgetController::class);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('transactions', TransactionController::class);
 
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
 });
 
 Route::middleware('auth')->group(function () {
