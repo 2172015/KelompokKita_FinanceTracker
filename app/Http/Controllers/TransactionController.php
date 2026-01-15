@@ -74,7 +74,7 @@ class TransactionController extends Controller
             'category_id'   => 'required|exists:categories,id',
             'amount'        => 'required|numeric|min:1',
             'date'          => 'required|date',
-            'description'   => 'nullable|string|max:255',
+            'transaction_notes'   => 'nullable|string|max:255',
             'type'          => 'required|in:income,expense',
         ]);
 
@@ -101,7 +101,7 @@ class TransactionController extends Controller
                 'category_id' => $request->category_id,
                 'amount'      => $request->amount,
                 'date'        => $request->date,
-                'description' => $request->description,
+                'transaction_notes' => $request->transaction_notes,
                 'type'        => $request->type,
             ]);
 

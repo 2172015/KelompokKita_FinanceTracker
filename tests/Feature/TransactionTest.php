@@ -43,7 +43,7 @@ class TransactionTest extends TestCase
                              'amount' => 50000,
                              'category_id' => $category->id,
                              'account_id' => $account->id,
-                             'transaction_notes' => 'Beli Nasi Goreng Testing',
+                             'transaction_notes' => 'Beli Nasi Goreng Testing', 
                          ]);
 
         // 3. ASSERT (Cek Hasil)
